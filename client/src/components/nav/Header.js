@@ -16,11 +16,11 @@ const { SubMenu, Item } = Menu;
 const Header = () => {
   const [current, setCurrent] = useState('');
 
-  let { user } = useSelector((state) => ({ ...state }));
+  const { user } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
-  let {
+  const {
     location: { pathname }
   } = useHistory();
 
