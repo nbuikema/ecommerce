@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { auth } from '../../firebase';
 
+import { Button } from 'antd';
+import { UserAddOutlined } from '@ant-design/icons';
+
 const Register = () => {
   const [email, setEmail] = useState('');
 
@@ -35,18 +38,29 @@ const Register = () => {
   };
 
   const registerForm = () => (
-    <form onSubmit={handleSubmit}>
-      <input
-        onChange={(e) => setEmail(e.target.value)}
-        value={email}
-        placeholder="Email"
-        type="email"
-        className="form-control"
-        autoFocus
-      />
-      <button type="submit" className="btn btn-raised" disabled={!email}>
+    <form>
+      <div className="form-group">
+        <input
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          placeholder="Email"
+          type="email"
+          className="form-control"
+          autoFocus
+        />
+      </div>
+      <Button
+        onClick={handleSubmit}
+        type="primary"
+        className="mb-3"
+        block
+        shape="round"
+        icon={<UserAddOutlined />}
+        size="large"
+        disabled={!email}
+      >
         Register
-      </button>
+      </Button>
     </form>
   );
 

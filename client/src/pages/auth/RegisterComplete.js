@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { auth } from '../../firebase';
+import { useDispatch } from 'react-redux';
 
-const Register = ({ history }) => {
+import { Button } from 'antd';
+import { UserAddOutlined } from '@ant-design/icons';
+
+const RegisterComplete = ({ history }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (window.localStorage.getItem('emailForRegistration')) {
@@ -44,11 +50,18 @@ const Register = ({ history }) => {
       );
 
       if (result.user.emailVerified) {
-        let user = auth.currentUser;
+        const user = auth.currentUser;
+        const idTokenResult = await user.getIdTokenResult();
 
         await user.updatePassword(password);
 
-        const idTokenResult = await user.getIdTokenResult();
+        dispatch({
+          type: 'LOGGED_IN_USER',
+          payload: {
+            email: user.email,
+            token: idTokenResult.token
+          }
+        });
 
         window.localStorage.removeItem('emailForRegistration');
         setEmail('');
@@ -68,39 +81,50 @@ const Register = ({ history }) => {
 
   const completeRegisterForm = () => (
     <form onSubmit={handleSubmit}>
-      <input
-        value={email}
-        placeholder="Email"
-        type="email"
-        className="form-control"
-        disabled
-      />
-      <input
-        onChange={(e) => setPassword(e.target.value)}
-        value={password}
-        placeholder="Password"
-        type="password"
-        className="form-control"
-        autoComplete="new-password"
-        disabled={!email}
-        autoFocus
-      />
-      <input
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        value={confirmPassword}
-        placeholder="Confirm Password"
-        type="password"
-        className="form-control"
-        autoComplete="new-password"
-        disabled={!email}
-      />
-      <button
-        type="submit"
-        className="btn btn-raised"
+      <div className="form-group">
+        <input
+          value={email}
+          placeholder="Email"
+          type="email"
+          className="form-control"
+          disabled
+        />
+      </div>
+      <div className="form-group">
+        <input
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
+          placeholder="Password"
+          type="password"
+          className="form-control"
+          autoComplete="new-password"
+          disabled={!email}
+          autoFocus
+        />
+      </div>
+      <div className="form-group">
+        <input
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          value={confirmPassword}
+          placeholder="Confirm Password"
+          type="password"
+          className="form-control"
+          autoComplete="new-password"
+          disabled={!email}
+        />
+      </div>
+      <Button
+        onClick={handleSubmit}
+        type="primary"
+        className="mb-3"
+        block
+        shape="round"
+        icon={<UserAddOutlined />}
+        size="large"
         disabled={!email || !password || !confirmPassword}
       >
         Complete Registration
-      </button>
+      </Button>
     </form>
   );
 
@@ -116,4 +140,4 @@ const Register = ({ history }) => {
   );
 };
 
-export default Register;
+export default RegisterComplete;
