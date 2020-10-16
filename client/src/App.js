@@ -4,6 +4,9 @@ import { ToastContainer } from 'react-toastify';
 import { auth } from './firebase';
 import { useDispatch } from 'react-redux';
 
+import NoPage from './components/auth/NoPage';
+import AuthedRoute from './components/auth/AuthedRoute';
+import UnAuthedRoute from './components/auth/UnAuthedRoute';
 import Header from './components/nav/Header';
 
 import Home from './pages/core/Home';
@@ -39,10 +42,19 @@ const App = () => {
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/register" component={Register} />
-        <Route exact path="/register/complete" component={RegisterComplete} />
-        <Route exact path="/forgot/password" component={ForgotPassword} />
+        <UnAuthedRoute exact path="/login" component={Login} />
+        <UnAuthedRoute exact path="/register" component={Register} />
+        <UnAuthedRoute
+          exact
+          path="/register/complete"
+          component={RegisterComplete}
+        />
+        <UnAuthedRoute
+          exact
+          path="/forgot/password"
+          component={ForgotPassword}
+        />
+        <Route path="*" exact component={NoPage} />
       </Switch>
     </>
   );
