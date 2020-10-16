@@ -8,6 +8,7 @@ import App from './App';
 
 import './index.css';
 import 'antd/dist/antd.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 ReactDOM.render(
   //<React.StrictMode>
