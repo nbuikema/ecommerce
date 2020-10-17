@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { auth } from '../../firebase';
 import { useDispatch } from 'react-redux';
+import { createOrUpdateUser } from '../../api/auth';
 
 import { Button } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
@@ -51,26 +52,35 @@ const RegisterComplete = ({ history }) => {
 
       if (result.user.emailVerified) {
         const user = auth.currentUser;
-        const idTokenResult = await user.getIdTokenResult();
+        const { token } = await user.getIdTokenResult();
 
         await user.updatePassword(password);
 
-        dispatch({
-          type: 'LOGGED_IN_USER',
-          payload: {
-            email: user.email,
-            token: idTokenResult.token
-          }
-        });
+        createOrUpdateUser(token)
+          .then(({ data: { _id, email, name, role } }) => {
+            window.localStorage.removeItem('emailForRegistration');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
 
-        window.localStorage.removeItem('emailForRegistration');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
+            toast.success(`${email} has been successfully registered.`);
 
-        toast.success(`${email} has been successfully registered.`);
+            dispatch({
+              type: 'LOGGED_IN_USER',
+              payload: {
+                _id,
+                email,
+                name,
+                role,
+                token
+              }
+            });
 
-        history.push('/');
+            history.push('/');
+          })
+          .catch((error) => {
+            toast.error(error);
+          });
       }
     } catch (error) {
       toast.error(

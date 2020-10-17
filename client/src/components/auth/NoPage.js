@@ -6,7 +6,7 @@ const NoPage = () => (
   <div className="container">
     <div className="row text-center">
       <div className="col-md-6 offset-md-3">
-        <img src="https://i.imgur.com/A040Lxr.png" />
+        <img src="https://i.imgur.com/A040Lxr.png" alt="Page Not Found" />
         <h4>This Page is Lost in Space.</h4>
         <div className="text">
           You thought this mission to the moon would be a quick six month thing.

@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { auth, googleAuthProvider } from '../../firebase';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { createOrUpdateUser } from '../../api/auth';
 
 import { Button } from 'antd';
 import { MailOutlined, GoogleOutlined } from '@ant-design/icons';
@@ -24,17 +25,26 @@ const Login = ({ history }) => {
 
     try {
       const { user } = await auth.signInWithEmailAndPassword(email, password);
-      const idTokenResult = await user.getIdTokenResult();
+      const { token } = await user.getIdTokenResult();
 
-      dispatch({
-        type: 'LOGGED_IN_USER',
-        payload: {
-          email: user.email,
-          token: idTokenResult.token
-        }
-      });
+      createOrUpdateUser(token)
+        .then(({ data: { _id, email, name, role } }) => {
+          dispatch({
+            type: 'LOGGED_IN_USER',
+            payload: {
+              _id,
+              email,
+              name,
+              role,
+              token
+            }
+          });
 
-      history.push('/');
+          history.push('/');
+        })
+        .catch((error) => {
+          toast.error(error);
+        });
     } catch (error) {
       toast.error(error.message);
     }
@@ -43,17 +53,26 @@ const Login = ({ history }) => {
   const googleLogin = async () => {
     try {
       await auth.signInWithPopup(googleAuthProvider).then(async ({ user }) => {
-        const idTokenResult = await user.getIdTokenResult();
+        const { token } = await user.getIdTokenResult();
 
-        dispatch({
-          type: 'LOGGED_IN_USER',
-          payload: {
-            email: user.email,
-            token: idTokenResult.token
-          }
-        });
+        createOrUpdateUser(token)
+          .then(({ data: { _id, email, name, role } }) => {
+            dispatch({
+              type: 'LOGGED_IN_USER',
+              payload: {
+                _id,
+                email,
+                name,
+                role,
+                token
+              }
+            });
 
-        history.push('/');
+            history.push('/');
+          })
+          .catch((error) => {
+            toast.error(error);
+          });
       });
     } catch (error) {
       toast.error(error.message);
