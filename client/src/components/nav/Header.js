@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 const { SubMenu, Item } = Menu;
 
-const Header = () => {
+const Header = ({ ready }) => {
   const [current, setCurrent] = useState('');
 
   const { user } = useSelector((state) => ({ ...state }));
@@ -46,7 +46,7 @@ const Header = () => {
     });
   };
 
-  return (
+  return !ready ? null : (
     <Menu onClick={handleClick} selectedKeys={[current]} mode="horizontal">
       <Item key="/home" icon={<AppstoreOutlined />}>
         <Link to="/">Home</Link>
@@ -58,8 +58,13 @@ const Header = () => {
           className="float-right"
         >
           <Item key="/user/dashboard" icon={<UserOutlined />}>
-            <Link to="/user/dashboard">Dashboard</Link>
+            <Link to="/user/dashboard">User Dashboard</Link>
           </Item>
+          {user && user.role === 'admin' && (
+            <Item key="/admin/dashboard" icon={<UserOutlined />}>
+              <Link to="/admin/dashboard">Admin Dashboard</Link>
+            </Item>
+          )}
           <Item onClick={logout} icon={<LogoutOutlined />}>
             Logout
           </Item>

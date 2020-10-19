@@ -26,7 +26,6 @@ const UserDashboard = () => {
   const infoForm = () => (
     <form>
       <div className="form-group">
-        <label>Password</label>
         <input
           onChange={(e) => setPassword(e.target.value)}
           value={password}

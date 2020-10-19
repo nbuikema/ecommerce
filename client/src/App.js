@@ -19,7 +19,9 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import UserDashboard from './pages/user/UserDashboard';
 import Orders from './pages/user/Orders';
 import Wishlist from './pages/user/Wishlist';
-import AdminDashboard from './pages/user/AdminDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import CreateCategory from './pages/admin/category/CreateCategory';
+import UpdateCategory from './pages/admin/category/UpdateCategory';
 
 const App = () => {
   const [ready, setReady] = useState(false);
@@ -59,7 +61,7 @@ const App = () => {
 
   return (
     <>
-      <Header />
+      <Header ready={ready} />
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
@@ -85,6 +87,18 @@ const App = () => {
           path="/admin/dashboard"
           ready={ready}
           component={AdminDashboard}
+        />
+        <AdminRoute
+          exact
+          path="/admin/category"
+          ready={ready}
+          component={CreateCategory}
+        />
+        <AdminRoute
+          exact
+          path="/admin/category/:slug"
+          ready={ready}
+          component={UpdateCategory}
         />
         <Route path="*" exact component={NoPage} />
       </Switch>

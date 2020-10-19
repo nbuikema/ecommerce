@@ -14,7 +14,4 @@ router.post('/create-or-update-user', authCheck, createOrUpdateUser);
 router.get('/current-user', authCheck, currentUser);
 router.get('/current-admin', authCheck, adminCheck, currentUser);
 
-// update
-// delete
-
 module.exports = router;

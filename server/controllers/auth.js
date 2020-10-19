@@ -1,7 +1,6 @@
 const User = require('../models/user');
 
 // create
-
 exports.createOrUpdateUser = async (req, res) => {
   let { name, email } = req.user;
 
@@ -24,7 +23,6 @@ exports.createOrUpdateUser = async (req, res) => {
 };
 
 // read
-
 exports.currentUser = async (req, res) => {
   await User.findOne({ email: req.user.email }).exec((error, user) => {
     if (error) {
@@ -33,6 +31,3 @@ exports.currentUser = async (req, res) => {
     return res.json(user);
   });
 };
-
-// update
-// delete

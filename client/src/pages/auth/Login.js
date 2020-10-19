@@ -90,6 +90,7 @@ const Login = ({ history }) => {
   const loginForm = () => (
     <form onSubmit={handleSubmit}>
       <div className="form-group">
+        <label>Email</label>
         <input
           onChange={(e) => setEmail(e.target.value)}
           value={email}
