@@ -7,6 +7,7 @@ import { Menu } from 'antd';
 import {
   AppstoreOutlined,
   SettingOutlined,
+  UserOutlined,
   UserAddOutlined,
   LogoutOutlined,
   LoginOutlined
@@ -26,9 +27,10 @@ const Header = () => {
 
   useEffect(() => {
     if (pathname === '/register/complete') {
-      return setCurrent('/register');
+      setCurrent('/register');
+    } else {
+      setCurrent(pathname);
     }
-    setCurrent(pathname);
   }, [pathname]);
 
   const handleClick = (e) => {
@@ -55,6 +57,9 @@ const Header = () => {
           title={user.email ? `${user.email}` : 'My Account'}
           className="float-right"
         >
+          <Item key="/user/dashboard" icon={<UserOutlined />}>
+            <Link to="/user/dashboard">Dashboard</Link>
+          </Item>
           <Item onClick={logout} icon={<LogoutOutlined />}>
             Logout
           </Item>
