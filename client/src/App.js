@@ -22,6 +22,8 @@ import Wishlist from './pages/user/Wishlist';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import CreateCategory from './pages/admin/category/CreateCategory';
 import UpdateCategory from './pages/admin/category/UpdateCategory';
+import CreateSubcategory from './pages/admin/subcategory/CreateSubcategory';
+import UpdateSubcategory from './pages/admin/subcategory/UpdateSubcategory';
 
 const App = () => {
   const [ready, setReady] = useState(false);
@@ -99,6 +101,18 @@ const App = () => {
           path="/admin/category/:slug"
           ready={ready}
           component={UpdateCategory}
+        />
+        <AdminRoute
+          exact
+          path="/admin/subcategory"
+          ready={ready}
+          component={CreateSubcategory}
+        />
+        <AdminRoute
+          exact
+          path="/admin/subcategory/:slug"
+          ready={ready}
+          component={UpdateSubcategory}
         />
         <Route path="*" exact component={NoPage} />
       </Switch>
