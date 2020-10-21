@@ -22,6 +22,12 @@ export const getCategory = async (slug) => {
   return await axios.get(`${process.env.REACT_APP_API}/category/read/${slug}`);
 };
 
+export const getCategorySubcategories = async (_id) => {
+  return await axios.get(
+    `${process.env.REACT_APP_API}/category/${_id}/subcategories`
+  );
+};
+
 // update category
 export const updateCategory = async (slug, category, authtoken) => {
   return await axios.put(

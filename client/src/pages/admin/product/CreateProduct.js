@@ -1,0 +1,115 @@
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import {
+  getAllCategories,
+  getCategorySubcategories
+} from '../../../api/category';
+import { createProduct } from '../../../api/product';
+
+import AdminNav from '../../../components/nav/AdminNav';
+import ProductForm from '../../../components/forms/ProductForm';
+import FileUpload from '../../../components/forms/FileUpload';
+
+const CreateProduct = () => {
+  const [product, setProduct] = useState({
+    title: '',
+    description: '',
+    price: '',
+    category: '',
+    subcategories: [],
+    quantity: '',
+    images: [],
+    shipping: 0
+  });
+  const [categories, setCategories] = useState([]);
+  const [subcats, setSubcats] = useState([]);
+
+  const {
+    user: { token }
+  } = useSelector((state) => ({ ...state }));
+
+  const loadCategories = () => {
+    getAllCategories().then((categories) => {
+      setCategories(categories.data);
+    });
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const handleChange = (e) => {
+    if (e.target.name === 'category') {
+      if (e.target.value === '-1') {
+        setSubcats([]);
+        setProduct({ ...product, category: '', subcategories: [] });
+      } else {
+        if (product.subcategories.length > 0) {
+          setProduct({
+            ...product,
+            category: e.target.value,
+            subcategories: []
+          });
+        } else {
+          setProduct({
+            ...product,
+            category: e.target.value
+          });
+        }
+        getCategorySubcategories(e.target.value).then((subcategories) => {
+          setSubcats(subcategories.data);
+        });
+      }
+    } else {
+      setProduct({ ...product, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    createProduct(product, token)
+      .then((res) => {
+        setProduct({
+          title: '',
+          description: '',
+          price: '',
+          category: '',
+          subcategories: [],
+          quantity: '',
+          images: [],
+          shipping: 0
+        });
+
+        toast.success(`${res.data.title} product has been created.`);
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error);
+      });
+  };
+
+  return (
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-md-2">
+          <AdminNav />
+        </div>
+        <div className="col">
+          <h4>Create Product</h4>
+          <FileUpload product={product} setProduct={setProduct} />
+          <ProductForm
+            product={product}
+            setProduct={setProduct}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            categories={categories}
+            subcats={subcats}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateProduct;

@@ -1,4 +1,5 @@
 const Category = require('../models/category');
+const Subcategory = require('../models/subcategory');
 const slugify = require('slugify');
 
 // create
@@ -28,6 +29,14 @@ exports.list = async (_, res) => {
   const categories = await Category.find().sort({ createdAt: -1 }).exec();
 
   res.json(categories);
+};
+
+exports.getCategorySubcategories = async (req, res) => {
+  const subcategories = await Subcategory.find({
+    parentCategory: req.params._id
+  }).exec();
+
+  res.json(subcategories);
 };
 
 // update

@@ -7,7 +7,8 @@ const {
   read,
   update,
   remove,
-  list
+  list,
+  getCategorySubcategories
 } = require('../controllers/category');
 
 // middleware
@@ -19,6 +20,7 @@ router.post('/create', authCheck, adminCheck, create);
 // read
 router.get('/read/:slug', read);
 router.get('/all', list);
+router.get('/:_id/subcategories', getCategorySubcategories);
 
 // update
 router.put('/update/:slug', authCheck, adminCheck, update);

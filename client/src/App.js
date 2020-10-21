@@ -24,6 +24,7 @@ import CreateCategory from './pages/admin/category/CreateCategory';
 import UpdateCategory from './pages/admin/category/UpdateCategory';
 import CreateSubcategory from './pages/admin/subcategory/CreateSubcategory';
 import UpdateSubcategory from './pages/admin/subcategory/UpdateSubcategory';
+import CreateProduct from './pages/admin/product/CreateProduct';
 
 const App = () => {
   const [ready, setReady] = useState(false);
@@ -113,6 +114,12 @@ const App = () => {
           path="/admin/subcategory/:slug"
           ready={ready}
           component={UpdateSubcategory}
+        />
+        <AdminRoute
+          exact
+          path="/admin/product"
+          ready={ready}
+          component={CreateProduct}
         />
         <Route path="*" exact component={NoPage} />
       </Switch>
