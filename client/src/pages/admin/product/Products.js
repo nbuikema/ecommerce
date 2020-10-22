@@ -69,12 +69,15 @@ const Products = () => {
           <AdminNav />
         </div>
         <div className="col">
-          {console.log(products)}
           <h4>Products</h4>
           <div className="row">
             {products.map((product) => (
-              <div className="col-md-4 pb-3" key={product._id}>
-                <ProductCard product={product} handleDelete={handleDelete} />
+              <div className="col-md-4 pb-3 d-flex" key={product._id}>
+                <ProductCard
+                  product={product}
+                  handleDelete={handleDelete}
+                  showAdmin={true}
+                />
               </div>
             ))}
           </div>

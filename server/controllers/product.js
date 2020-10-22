@@ -35,6 +35,32 @@ exports.list = async (req, res) => {
   res.json(products);
 };
 
+exports.listCount = async (_, res) => {
+  const totalProducts = await Product.find().estimatedDocumentCount().exec();
+
+  res.json(totalProducts);
+};
+
+exports.listWithQuery = async (req, res) => {
+  try {
+    const { sort, order, limit, page } = req.body;
+    const currentPage = page || 1;
+    const perPage = limit || 3;
+
+    const products = await Product.find()
+      .skip((currentPage - 1) * perPage)
+      .populate('category')
+      .populate('subcategories')
+      .sort([[sort, order]])
+      .limit(limit)
+      .exec();
+
+    res.json(products);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 // update
 exports.update = async (req, res) => {
   try {

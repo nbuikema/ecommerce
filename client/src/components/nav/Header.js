@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 const { SubMenu, Item } = Menu;
 
-const Header = ({ ready }) => {
+const Header = () => {
   const [current, setCurrent] = useState('');
 
   const { user } = useSelector((state) => ({ ...state }));
@@ -46,9 +46,9 @@ const Header = ({ ready }) => {
     });
   };
 
-  return !ready ? null : (
+  return (
     <Menu onClick={handleClick} selectedKeys={[current]} mode="horizontal">
-      <Item key="/home" icon={<AppstoreOutlined />}>
+      <Item key="/" icon={<AppstoreOutlined />}>
         <Link to="/">Home</Link>
       </Item>
       {user ? (

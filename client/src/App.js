@@ -66,7 +66,7 @@ const App = () => {
 
   return (
     <>
-      <Header ready={ready} />
+      <Header />
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
