@@ -12,6 +12,7 @@ import NoPage from './components/auth/NoPage';
 import Header from './components/nav/Header';
 
 import Home from './pages/core/Home';
+import Product from './pages/core/Product';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import RegisterComplete from './pages/auth/RegisterComplete';
@@ -70,6 +71,7 @@ const App = () => {
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
+        <Route exact path="/product/:slug" component={Product} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/register/complete" component={RegisterComplete} />
