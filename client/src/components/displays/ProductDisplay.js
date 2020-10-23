@@ -1,16 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import StarRatings from 'react-star-ratings';
+
+import RatingModal from '../../components/modals/RatingModal';
+import AverageRatingDisplay from './AverageRatingDisplay';
 
 import { Card, Tabs } from 'antd';
-import {
-  HeartOutlined,
-  ShoppingCartOutlined,
-  StarOutlined
-} from '@ant-design/icons';
+import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 const { TabPane } = Tabs;
 
-const ProductDisplay = ({ product }) => {
+const ProductDisplay = ({
+  product,
+  handleChangeRating,
+  handleSubmitRating,
+  rating
+}) => {
   const {
+    _id,
     title,
     description,
     images,
@@ -89,7 +95,9 @@ const ProductDisplay = ({ product }) => {
       <div className="col-md-7">{showImages()}</div>
       <div className="col-md-5">
         <h1 className="bg-info rounded p-3">{title}</h1>
+        <AverageRatingDisplay product={product} />
         <Card
+          className="mt-3"
           actions={[
             <>
               <ShoppingCartOutlined className="text-success" />
@@ -101,11 +109,19 @@ const ProductDisplay = ({ product }) => {
               <br />
               Add To Wishlist
             </>,
-            <>
-              <StarOutlined className="text-danger" />
-              <br />
-              Leave Rating
-            </>
+            <RatingModal
+              handleSubmitRating={handleSubmitRating}
+              product={_id}
+              rating={rating}
+            >
+              <StarRatings
+                name={_id}
+                numberOfStars={5}
+                starRatedColor="red"
+                rating={rating}
+                changeRating={handleChangeRating}
+              />
+            </RatingModal>
           ]}
         >
           <ul className="list-group mb-4">

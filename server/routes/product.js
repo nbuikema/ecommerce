@@ -9,7 +9,9 @@ const {
   read,
   update,
   listWithQuery,
-  listCount
+  listCount,
+  rateProduct,
+  listRelated
 } = require('../controllers/product');
 
 // middleware
@@ -23,9 +25,11 @@ router.get('/read/:slug', read);
 router.get('/all/:count', list);
 router.get('/count', listCount);
 router.post('/query', listWithQuery);
+router.get('/related/:productId', listRelated);
 
 // update
 router.put('/update/:slug', authCheck, adminCheck, update);
+router.put('/rate/:productId', authCheck, rateProduct);
 
 // delete
 router.delete('/delete/:slug', authCheck, adminCheck, remove);

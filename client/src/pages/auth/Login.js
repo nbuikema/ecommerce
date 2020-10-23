@@ -15,10 +15,15 @@ const Login = ({ history }) => {
   const dispatch = useDispatch();
 
   const roleBasedRedirect = (role) => {
-    if (role === 'admin') {
-      history.push('/admin/dashboard');
+    const redirectPage = history.location.state;
+    if (redirectPage) {
+      history.push(redirectPage.from);
     } else {
-      history.push('/user/dashboard');
+      if (role === 'admin') {
+        history.push('/admin/dashboard');
+      } else {
+        history.push('/user/dashboard');
+      }
     }
   };
 

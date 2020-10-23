@@ -21,7 +21,7 @@ mongoose
 
 // apply middlewares
 app.use(morgan('dev'));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 
 // dynamically import and read routes from fs

@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const User = require('../models/user');
 const slugify = require('slugify');
 
 // create
@@ -61,6 +62,22 @@ exports.listWithQuery = async (req, res) => {
   }
 };
 
+exports.listRelated = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec();
+
+  const related = await Product.find({
+    _id: { $ne: product._id },
+    category: product.category
+  })
+    .limit(3)
+    .populate('category')
+    .populate('subcategories')
+    .sort([['createdAt', 'desc']])
+    .exec();
+
+  res.json(related);
+};
+
 // update
 exports.update = async (req, res) => {
   try {
@@ -79,6 +96,50 @@ exports.update = async (req, res) => {
     res.json(updated);
   } catch (error) {
     res.status(400).send('Could not update category.');
+  }
+};
+
+exports.rateProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId).exec();
+
+    const user = await User.findOne({ email: req.user.email }).exec();
+
+    const existingRating = product.ratings.find((rating) => {
+      return rating.postedBy.toString() === user._id.toString();
+    });
+
+    if (existingRating) {
+      const updatedRating = await Product.updateOne(
+        {
+          ratings: { $elemMatch: existingRating }
+        },
+        {
+          $set: { 'ratings.$.rating': req.body.rating }
+        },
+        {
+          new: true,
+          timestamps: false
+        }
+      ).exec();
+
+      res.json(updatedRating);
+    } else {
+      const newRating = await Product.findByIdAndUpdate(
+        product._id,
+        {
+          $push: { ratings: { rating: req.body.rating, postedBy: user._id } }
+        },
+        {
+          new: true,
+          timestamps: false
+        }
+      ).exec();
+
+      res.json(newRating);
+    }
+  } catch (error) {
+    res.status(400).send('Could not leave rating for this product.');
   }
 };
 

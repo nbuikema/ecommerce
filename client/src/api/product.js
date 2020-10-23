@@ -35,11 +35,29 @@ export const getProductsWithQuery = async (sort, order, limit, page) => {
   });
 };
 
+export const getRelatedProducts = async (productId) => {
+  return await axios.get(
+    `${process.env.REACT_APP_API}/product/related/${productId}`
+  );
+};
+
 // update product
 export const updateProduct = async (slug, product, authtoken) => {
   return await axios.put(
     `${process.env.REACT_APP_API}/product/update/${slug}`,
     product,
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
+};
+
+export const rateProduct = async (productId, rating, authtoken) => {
+  return await axios.put(
+    `${process.env.REACT_APP_API}/product/rate/${productId}`,
+    { rating },
     {
       headers: {
         authtoken

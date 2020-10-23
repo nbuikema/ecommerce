@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
+import AverageRatingDisplay from '../displays/AverageRatingDisplay';
+
 import { Card, Badge } from 'antd';
 import {
   EditOutlined,
@@ -67,12 +69,17 @@ const ProductCard = ({
     <Card
       hoverable
       cover={
-        <img
-          alt={title}
-          src={images && images.length > 0 ? images[0].url : ''}
-          style={{ height: '180px', objectFit: 'cover' }}
-          className="p-1"
-        />
+        <>
+          <div className="mt-3 mb-1">
+            <AverageRatingDisplay product={product} />
+          </div>
+          <img
+            alt={title}
+            src={images && images.length > 0 ? images[0].url : ''}
+            style={{ height: '180px', objectFit: 'cover' }}
+            className="p-1"
+          />
+        </>
       }
       actions={showActions()}
       className="d-flex flex-column w-100"

@@ -47,7 +47,7 @@ const productSchema = new mongoose.Schema(
     shipping: Boolean,
     ratings: [
       {
-        star: Number,
+        rating: Number,
         postedBy: {
           type: ObjectId,
           ref: 'User'
