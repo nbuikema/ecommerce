@@ -7,7 +7,7 @@ import LoadingCard from '../../components/cards/LoadingCard';
 
 import { Pagination } from 'antd';
 
-const HomeDisplay = ({ name, sort, order, limit }) => {
+const ProductsDisplay = ({ name, sort, order, limit }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [productsCount, setProductsCount] = useState(0);
@@ -20,8 +20,37 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
         setProductsCount(res.data);
         getProductsWithQuery(sort, order, limit, page)
           .then((res) => {
-            setProducts(res.data);
-            setLoading(false);
+            if (res.data[0].averageRating) {
+              let productsArray = [];
+
+              for (let i = 0; i < res.data.length; i++) {
+                let newRatings = [];
+
+                if (res.data[i].data.length > 1) {
+                  for (let j = 0; j < res.data[i].data.length; j++) {
+                    newRatings.push(res.data[i].data[j].ratings);
+                  }
+                  productsArray.push({
+                    ...res.data[i].data[0],
+                    ratings: newRatings,
+                    averageRating: res.data[i].averageRating
+                  });
+                } else {
+                  newRatings.push(res.data[i].data[0].ratings);
+
+                  productsArray.push({
+                    ...res.data[i].data[0],
+                    ratings: newRatings,
+                    averageRating: res.data[i].averageRating
+                  });
+                }
+              }
+              setProducts(productsArray);
+              setLoading(false);
+            } else {
+              setProducts(res.data);
+              setLoading(false);
+            }
           })
           .catch((error) => {
             toast.error(error);
@@ -76,4 +105,4 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
   );
 };
 
-export default HomeDisplay;
+export default ProductsDisplay;

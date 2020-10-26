@@ -1,5 +1,7 @@
 const Product = require('../models/product');
 const User = require('../models/user');
+const Category = require('../models/category');
+const Subcategory = require('../models/subcategory');
 const slugify = require('slugify');
 
 // create
@@ -45,19 +47,39 @@ exports.listCount = async (_, res) => {
 exports.listWithQuery = async (req, res) => {
   try {
     const { sort, order, limit, page } = req.body;
-    const currentPage = page || 1;
-    const perPage = limit || 3;
+    const currentPage = page;
+    const perPage = limit;
+    const skipBy = (currentPage - 1) * perPage;
 
-    const products = await Product.find()
-      .skip((currentPage - 1) * perPage)
-      .populate('category')
-      .populate('subcategories')
-      .sort([[sort, order]])
-      .limit(limit)
-      .exec();
+    if (sort && sort === 'averageRating') {
+      const products = await Product.aggregate([
+        { $unwind: '$ratings' },
+        {
+          $group: {
+            _id: '$_id',
+            averageRating: { $avg: '$ratings.rating' },
+            data: { $push: '$$ROOT' }
+          }
+        },
+        { $sort: { averageRating: -1 } },
+        { $skip: skipBy },
+        { $limit: limit }
+      ]).exec();
 
-    res.json(products);
+      res.json(products);
+    } else {
+      const products = await Product.find()
+        .skip(skipBy)
+        .populate('category')
+        .populate('subcategories')
+        .sort([[sort, order]])
+        .limit(limit)
+        .exec();
+
+      res.json(products);
+    }
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -76,6 +98,65 @@ exports.listRelated = async (req, res) => {
     .exec();
 
   res.json(related);
+};
+
+exports.listByRatings = async (req, res) => {
+  try {
+    const { sort, order, limit, page } = req.body;
+    const currentPage = page;
+    const perPage = limit;
+    const skipBy = (currentPage - 1) * perPage;
+
+    if (sort && sort === 'averageRating') {
+      const products = await Product.aggregate([
+        { $unwind: '$ratings' },
+        {
+          $group: {
+            _id: '$_id',
+            averageRating: { $avg: '$ratings.rating' },
+            data: { $push: '$$ROOT' }
+          }
+        },
+        { $sort: { averageRating: order } },
+        { $skip: skipBy },
+        { $limit: limit }
+      ]).exec();
+
+      res.json(products);
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.listAllInCategory = async (req, res) => {
+  const category = await Category.findOne({
+    slug: req.params.categorySlug
+  }).exec();
+
+  const products = await Product.find({
+    category
+  })
+    .populate('category')
+    .populate('subcategories')
+    .exec();
+
+  res.json({ products, category });
+};
+
+exports.listAllInSubcategory = async (req, res) => {
+  const subcategory = await Subcategory.findOne({
+    slug: req.params.subcategorySlug
+  }).exec();
+
+  const products = await Product.find({
+    subcategories: subcategory
+  })
+    .populate('category')
+    .populate('subcategories')
+    .exec();
+
+  res.json({ products, subcategory });
 };
 
 // update

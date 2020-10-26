@@ -41,6 +41,18 @@ export const getRelatedProducts = async (productId) => {
   );
 };
 
+export const getProductsInCategory = async (categorySlug) => {
+  return await axios.get(
+    `${process.env.REACT_APP_API}/product/by/category/${categorySlug}`
+  );
+};
+
+export const getProductsInSubcategory = async (subcategorySlug) => {
+  return await axios.get(
+    `${process.env.REACT_APP_API}/product/by/subcategory/${subcategorySlug}`
+  );
+};
+
 // update product
 export const updateProduct = async (slug, product, authtoken) => {
   return await axios.put(

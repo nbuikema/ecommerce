@@ -13,6 +13,7 @@ import Header from './components/nav/Header';
 
 import Home from './pages/core/Home';
 import Product from './pages/core/Product';
+import Category from './pages/core/Category';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import RegisterComplete from './pages/auth/RegisterComplete';
@@ -72,6 +73,12 @@ const App = () => {
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/product/:slug" ready={ready} component={Product} />
+        <Route
+          exact
+          path="/:categoryType/:slug"
+          ready={ready}
+          component={Category}
+        />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/register/complete" component={RegisterComplete} />
