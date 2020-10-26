@@ -53,6 +53,13 @@ export const getProductsInSubcategory = async (subcategorySlug) => {
   );
 };
 
+export const getProductsWithFilter = async (args) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/product/search/filters`,
+    args
+  );
+};
+
 // update product
 export const updateProduct = async (slug, product, authtoken) => {
   return await axios.put(

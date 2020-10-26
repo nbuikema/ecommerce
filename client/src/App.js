@@ -14,6 +14,7 @@ import Header from './components/nav/Header';
 import Home from './pages/core/Home';
 import Product from './pages/core/Product';
 import Category from './pages/core/Category';
+import Shop from './pages/core/Shop';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import RegisterComplete from './pages/auth/RegisterComplete';
@@ -72,13 +73,8 @@ const App = () => {
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route exact path="/product/:slug" ready={ready} component={Product} />
-        <Route
-          exact
-          path="/:categoryType/:slug"
-          ready={ready}
-          component={Category}
-        />
+        <Route exact path="/product/:slug" component={Product} />
+        <Route exact path="/shop" component={Shop} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/register/complete" component={RegisterComplete} />
@@ -144,6 +140,7 @@ const App = () => {
           ready={ready}
           component={Products}
         />
+        <Route exact path="/:categoryType/:slug" component={Category} />
         <Route path="*" exact component={NoPage} />
       </Switch>
     </>

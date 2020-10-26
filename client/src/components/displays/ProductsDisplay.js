@@ -24,26 +24,10 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
               let productsArray = [];
 
               for (let i = 0; i < res.data.length; i++) {
-                let newRatings = [];
-
-                if (res.data[i].data.length > 1) {
-                  for (let j = 0; j < res.data[i].data.length; j++) {
-                    newRatings.push(res.data[i].data[j].ratings);
-                  }
-                  productsArray.push({
-                    ...res.data[i].data[0],
-                    ratings: newRatings,
-                    averageRating: res.data[i].averageRating
-                  });
-                } else {
-                  newRatings.push(res.data[i].data[0].ratings);
-
-                  productsArray.push({
-                    ...res.data[i].data[0],
-                    ratings: newRatings,
-                    averageRating: res.data[i].averageRating
-                  });
-                }
+                productsArray.push({
+                  ...res.data[i].document,
+                  averageRating: res.data[i].averageRating
+                });
               }
               setProducts(productsArray);
               setLoading(false);

@@ -53,12 +53,10 @@ exports.listWithQuery = async (req, res) => {
 
     if (sort && sort === 'averageRating') {
       const products = await Product.aggregate([
-        { $unwind: '$ratings' },
         {
-          $group: {
-            _id: '$_id',
-            averageRating: { $avg: '$ratings.rating' },
-            data: { $push: '$$ROOT' }
+          $project: {
+            document: '$$ROOT',
+            averageRating: { $avg: '$ratings.rating' }
           }
         },
         { $sort: { averageRating: -1 } },
@@ -79,7 +77,6 @@ exports.listWithQuery = async (req, res) => {
       res.json(products);
     }
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -98,35 +95,6 @@ exports.listRelated = async (req, res) => {
     .exec();
 
   res.json(related);
-};
-
-exports.listByRatings = async (req, res) => {
-  try {
-    const { sort, order, limit, page } = req.body;
-    const currentPage = page;
-    const perPage = limit;
-    const skipBy = (currentPage - 1) * perPage;
-
-    if (sort && sort === 'averageRating') {
-      const products = await Product.aggregate([
-        { $unwind: '$ratings' },
-        {
-          $group: {
-            _id: '$_id',
-            averageRating: { $avg: '$ratings.rating' },
-            data: { $push: '$$ROOT' }
-          }
-        },
-        { $sort: { averageRating: order } },
-        { $skip: skipBy },
-        { $limit: limit }
-      ]).exec();
-
-      res.json(products);
-    }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
 };
 
 exports.listAllInCategory = async (req, res) => {
@@ -157,6 +125,78 @@ exports.listAllInSubcategory = async (req, res) => {
     .exec();
 
   res.json({ products, subcategory });
+};
+
+const handleQuery = async (req, res) => {
+  try {
+    let filteredSearch = [];
+    let foundProducts = [];
+
+    for (let [key, value] of Object.entries(req.body)) {
+      if (key === 'query' && value.length > 0) {
+        filteredSearch.push({ $text: { $search: value } });
+      }
+
+      if (key === 'price' && value[0] >= 0 && value[1] > 0) {
+        filteredSearch.push({ price: { $gte: value[0], $lte: value[1] } });
+      }
+
+      if (key === 'categories' && value.length > 0) {
+        filteredSearch.push({ category: value });
+      }
+
+      if (key === 'subcategories' && value.length > 0) {
+        filteredSearch.push({ subcategories: { $in: value } });
+      }
+
+      if (key === 'rating' && value) {
+        await Product.aggregate([
+          {
+            $project: {
+              document: '$$ROOT',
+              floorAverage: {
+                $floor: { $avg: '$ratings.rating' }
+              }
+            }
+          },
+          { $match: { floorAverage: value } }
+        ])
+          .exec()
+          .then((aggregates) => {
+            aggregates.forEach((product) => {
+              foundProducts.push(product._id.toString());
+            });
+          });
+
+        filteredSearch.push({ _id: foundProducts });
+      }
+
+      if (key === 'shipping' && value !== null) {
+        filteredSearch.push({ shipping: value });
+      }
+    }
+
+    const products = await Product.find({
+      $and: filteredSearch
+    })
+      .populate('category')
+      .populate('subcategory')
+      .sort([req.body.sort])
+      .exec();
+
+    res.json(products);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.searchFilters = async (req, res) => {
+  try {
+    await handleQuery(req, res);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 // update

@@ -12,9 +12,9 @@ const {
   listCount,
   rateProduct,
   listRelated,
-  listByRatings,
   listAllInCategory,
-  listAllInSubcategory
+  listAllInSubcategory,
+  searchFilters
 } = require('../controllers/product');
 
 // middleware
@@ -29,9 +29,9 @@ router.get('/all/:count', list);
 router.get('/count', listCount);
 router.post('/query', listWithQuery);
 router.get('/related/:productId', listRelated);
-router.get('/by/ratings', listByRatings);
 router.get('/by/category/:categorySlug', listAllInCategory);
 router.get('/by/subcategory/:subcategorySlug', listAllInSubcategory);
+router.post('/search/filters', searchFilters);
 
 // update
 router.put('/update/:slug', authCheck, adminCheck, update);

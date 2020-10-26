@@ -47,3 +47,11 @@
 .carousel-inner {
   height: 60vh;
 }
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: inherit !important;
+}
+
+.ant-menu-inline .ant-menu-item::after {
+  border: none !important;
+}

@@ -3,6 +3,8 @@ import { Link, useHistory } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { useDispatch, useSelector } from 'react-redux';
 
+import Search from '../forms/Search';
+
 import { Menu } from 'antd';
 import {
   AppstoreOutlined,
@@ -10,7 +12,8 @@ import {
   UserOutlined,
   UserAddOutlined,
   LogoutOutlined,
-  LoginOutlined
+  LoginOutlined,
+  ShoppingOutlined
 } from '@ant-design/icons';
 const { SubMenu, Item } = Menu;
 
@@ -51,6 +54,9 @@ const Header = () => {
       <Item key="/" icon={<AppstoreOutlined />}>
         <Link to="/">Home</Link>
       </Item>
+      <Item key="/shop" icon={<ShoppingOutlined />}>
+        <Link to="/shop">Shop</Link>
+      </Item>
       {user ? (
         <SubMenu
           icon={<SettingOutlined />}
@@ -83,6 +89,9 @@ const Header = () => {
           </Item>
         </>
       )}
+      <span className="float-right p-1">
+        <Search />
+      </span>
     </Menu>
   );
 };
