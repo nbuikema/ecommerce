@@ -23,16 +23,16 @@ const Search = () => {
       payload: { text: search }
     });
 
-    history.push('/shop');
+    history.push(`/shop?text=${search}`);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-inline my-2 my-lg-0">
+    <form onSubmit={handleSubmit} className="form-inline my-0">
       <input
         value={search}
         onChange={handleChange}
         type="search"
-        className="form-control mr-sm-2"
+        className="form-control mr-2"
         placeholder="Search Anything"
       />
       <SearchOutlined onClick={handleSubmit} style={{ cursor: 'pointer' }} />

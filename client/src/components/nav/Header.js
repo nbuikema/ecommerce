@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Search from '../forms/Search';
 
-import { Menu } from 'antd';
+import { Menu, Badge, Affix } from 'antd';
 import {
   AppstoreOutlined,
   SettingOutlined,
@@ -13,20 +13,19 @@ import {
   UserAddOutlined,
   LogoutOutlined,
   LoginOutlined,
-  ShoppingOutlined
+  ShoppingOutlined,
+  ShoppingCartOutlined
 } from '@ant-design/icons';
 const { SubMenu, Item } = Menu;
 
 const Header = () => {
   const [current, setCurrent] = useState('');
 
-  const { user } = useSelector((state) => ({ ...state }));
+  const { user, cart } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
-  const {
-    location: { pathname }
-  } = useHistory();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     if (pathname === '/register/complete') {
@@ -35,10 +34,6 @@ const Header = () => {
       setCurrent(pathname);
     }
   }, [pathname]);
-
-  const handleClick = (e) => {
-    setCurrent(e.key);
-  };
 
   const logout = () => {
     auth.signOut();
@@ -49,50 +44,87 @@ const Header = () => {
     });
   };
 
+  const getCartQuantity = () => {
+    return cart.reduce((acc, item) => {
+      return acc + item.quantity;
+    }, 0);
+  };
+
+  const handleDrawerToggle = () => {
+    dispatch({
+      type: 'TOGGLE_SHOW',
+      payload: true
+    });
+  };
+
   return (
-    <Menu onClick={handleClick} selectedKeys={[current]} mode="horizontal">
-      <Item key="/" icon={<AppstoreOutlined />}>
-        <Link to="/">Home</Link>
-      </Item>
-      <Item key="/shop" icon={<ShoppingOutlined />}>
-        <Link to="/shop">Shop</Link>
-      </Item>
-      {user ? (
-        <SubMenu
-          icon={<SettingOutlined />}
-          title={user.email ? `${user.email}` : 'My Account'}
-          className="float-right"
+    <Affix>
+      <Menu selectedKeys={[current]} mode="horizontal">
+        <Item className="m-0 px-3" key="/" icon={<AppstoreOutlined />}>
+          <Link to="/">Home</Link>
+        </Item>
+        <Item className="m-0 px-3" key="/shop" icon={<ShoppingOutlined />}>
+          <Link to="/shop">Shop</Link>
+        </Item>
+        <Item
+          className="m-0 px-3"
+          key="/cart"
+          icon={<ShoppingCartOutlined />}
+          onClick={handleDrawerToggle}
         >
-          <Item key="/user/dashboard" icon={<UserOutlined />}>
-            <Link to="/user/dashboard">User Dashboard</Link>
-          </Item>
-          {user && user.role === 'admin' && (
-            <Item key="/admin/dashboard" icon={<UserOutlined />}>
-              <Link to="/admin/dashboard">Admin Dashboard</Link>
-            </Item>
-          )}
-          <Item onClick={logout} icon={<LogoutOutlined />}>
-            Logout
-          </Item>
-        </SubMenu>
-      ) : (
-        <>
-          <Item
-            key="/register"
-            icon={<UserAddOutlined />}
+          <Badge count={getCartQuantity()} offset={[12, 0]}>
+            Cart
+          </Badge>
+        </Item>
+        {user ? (
+          <SubMenu
+            icon={<SettingOutlined />}
+            title={user.email ? `${user.email}` : 'My Account'}
             className="float-right"
           >
-            <Link to="/register">Register</Link>
-          </Item>
-          <Item key="/login" icon={<LoginOutlined />} className="float-right">
-            <Link to="/login">Login</Link>
-          </Item>
-        </>
-      )}
-      <span className="float-right p-1">
-        <Search />
-      </span>
-    </Menu>
+            <Item
+              className="m-0 px-3"
+              key="/user/dashboard"
+              icon={<UserOutlined />}
+            >
+              <Link to="/user/dashboard">User Dashboard</Link>
+            </Item>
+            {user && user.role === 'admin' && (
+              <Item
+                className="m-0 px-3"
+                key="/admin/dashboard"
+                icon={<UserOutlined />}
+              >
+                <Link to="/admin/dashboard">Admin Dashboard</Link>
+              </Item>
+            )}
+            <Item onClick={logout} icon={<LogoutOutlined />}>
+              Logout
+            </Item>
+          </SubMenu>
+        ) : (
+          <>
+            <Item
+              key="/register"
+              icon={<UserAddOutlined />}
+              className="float-right m-0 px-3"
+            >
+              <Link to="/register">Register</Link>
+            </Item>
+            <Item
+              key="/login"
+              icon={<LoginOutlined />}
+              className="float-right m-0 px-3"
+            >
+              <Link to="/login">Login</Link>
+            </Item>
+          </>
+        )}
+        <span className="float-right px-1 mt-2">
+          <Search />
+        </span>
+      </Menu>
+    </Affix>
   );
 };
 

@@ -45,6 +45,7 @@ const RatingModal = ({ children, handleSubmitRating, product, rating }) => {
           handleSubmitRating(product);
         }}
         onCancel={() => setModalVisible(false)}
+        maskTransitionName=""
       >
         {children}
       </Modal>

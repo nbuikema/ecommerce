@@ -15,6 +15,8 @@ import Home from './pages/core/Home';
 import Product from './pages/core/Product';
 import Category from './pages/core/Category';
 import Shop from './pages/core/Shop';
+import Cart from './pages/core/Cart';
+import CartDrawerModal from './components/modals/CartDrawerModal';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import RegisterComplete from './pages/auth/RegisterComplete';
@@ -70,11 +72,13 @@ const App = () => {
   return (
     <>
       <Header />
+      <CartDrawerModal />
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/product/:slug" component={Product} />
         <Route exact path="/shop" component={Shop} />
+        <Route exact path="/cart" component={Cart} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/register/complete" component={RegisterComplete} />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import StarRatings from 'react-star-ratings';
+import { useDispatch } from 'react-redux';
 
 import RatingModal from '../../components/modals/RatingModal';
 import AverageRatingDisplay from './AverageRatingDisplay';
@@ -26,6 +27,20 @@ const ProductDisplay = ({
     shipping,
     quantity
   } = product;
+
+  const dispatch = useDispatch();
+
+  const handleAddToCart = () => {
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: { product, quantity: 1 }
+    });
+
+    dispatch({
+      type: 'TOGGLE_SHOW',
+      payload: true
+    });
+  };
 
   const showImages = () => (
     <div
@@ -99,11 +114,11 @@ const ProductDisplay = ({
         <Card
           className="mt-3"
           actions={[
-            <>
+            <div onClick={handleAddToCart} style={{ cursor: 'pointer' }}>
               <ShoppingCartOutlined className="text-success" />
               <br />
               Add To Cart
-            </>,
+            </div>,
             <>
               <HeartOutlined className="text-info" />
               <br />

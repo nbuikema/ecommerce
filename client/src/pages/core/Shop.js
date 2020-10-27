@@ -3,6 +3,7 @@ import { getProductsWithFilter } from '../../api/product';
 import { getAllCategories } from '../../api/category';
 import { getAllSubcategories } from '../../api/subcategory';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import ProductCard from '../../components/cards/ProductCard';
 import RatingsForm from '../../components/forms/RatingsForm';
@@ -25,13 +26,15 @@ const Shop = () => {
   const [price, setPrice] = useState([null, null]);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const [rating, setRating] = useState('');
+  const [rating, setRating] = useState(null);
   const [shipping, setShipping] = useState(null);
-  const [sort, setSort] = useState(['sold', 'desc']);
+  const [sort, setSort] = useState(['Best Sellers', 'sold', 'desc']);
 
   const {
     search: { text }
   } = useSelector((state) => ({ ...state }));
+
+  const history = useHistory();
 
   useEffect(() => {
     let subscribed = true;
@@ -47,6 +50,23 @@ const Shop = () => {
         setAllSubcategories(subcategories.data);
       }
     });
+
+    if (history.location.search && history.location.search.length > 0) {
+      const params = history.location.search.split('?');
+      params.shift();
+
+      let search = [];
+      params.forEach((param) => {
+        search.push(param.split('='));
+      });
+
+      search.forEach((filter) => {
+        if (filter[0] === 'shipping') {
+          const booleanShipping = filter[1] === 'true';
+          setShipping(booleanShipping);
+        }
+      });
+    }
 
     let submitPrice = [];
     if (!price[0] && !price[1]) {
@@ -102,6 +122,49 @@ const Shop = () => {
       sort: [sort[1], sort[2]]
     }).then((products) => {
       setProducts(products.data);
+
+      let path = '';
+
+      if (text) {
+        path += `?text=${text}`;
+      }
+      if (price[0]) {
+        path += `?price=gt${price[0]}`;
+      }
+      if (price[1]) {
+        path += `?price=lt${price[1]}`;
+      }
+      if (categories && categories.length > 0) {
+        path += `?categories=`;
+        categories.forEach((category, index, categories) => {
+          if (Object.is(categories.length - 1, index)) {
+            path += `${category}`;
+          } else {
+            path += `${category}&`;
+          }
+        });
+      }
+      if (subcategories && subcategories.length > 0) {
+        path += `?subcategories=`;
+        subcategories.forEach((subcategory, index, subcategories) => {
+          if (Object.is(subcategories.length - 1, index)) {
+            path += `${subcategory}`;
+          } else {
+            path += `${subcategory}&`;
+          }
+        });
+      }
+      if (rating) {
+        path += `?rating=${rating}`;
+      }
+      if (shipping !== null) {
+        path += `?shipping=${shipping}`;
+      }
+      if (sort) {
+        path += `?sort=${sort[1]}-${sort[2]}`;
+      }
+
+      history.push(`/shop${path}`);
     });
   };
 
@@ -326,6 +389,7 @@ const Shop = () => {
                 <Select
                   className="w-100"
                   defaultValue={null}
+                  value={shipping && shipping}
                   onChange={(value) => setShipping(value)}
                 >
                   <Option value={null}>Select</Option>

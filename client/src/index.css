@@ -55,3 +55,12 @@
 .ant-menu-inline .ant-menu-item::after {
   border: none !important;
 }
+
+.ant-modal-centered .ant-modal {
+  width: 60vw !important;
+  height: auto !important;
+}
+
+.table td {
+  vertical-align: middle;
+}
