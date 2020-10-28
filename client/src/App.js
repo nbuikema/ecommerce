@@ -16,6 +16,7 @@ import Product from './pages/core/Product';
 import Category from './pages/core/Category';
 import Shop from './pages/core/Shop';
 import Cart from './pages/core/Cart';
+import Checkout from './pages/core/Checkout';
 import CartDrawerModal from './components/modals/CartDrawerModal';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -44,7 +45,7 @@ const App = () => {
         const { token } = await user.getIdTokenResult();
 
         currentUser(token)
-          .then(({ data: { _id, email, name, role } }) => {
+          .then(({ data: { _id, email, name, role, cart, address } }) => {
             dispatch({
               type: 'LOGGED_IN_USER',
               payload: {
@@ -52,8 +53,14 @@ const App = () => {
                 email,
                 name,
                 role,
+                address,
                 token
               }
+            });
+
+            dispatch({
+              type: 'GET_CART_FROM_DB',
+              payload: cart
             });
 
             setReady(true);
@@ -79,6 +86,7 @@ const App = () => {
         <Route exact path="/product/:slug" component={Product} />
         <Route exact path="/shop" component={Shop} />
         <Route exact path="/cart" component={Cart} />
+        <Route exact path="/checkout" component={Checkout} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/register/complete" component={RegisterComplete} />

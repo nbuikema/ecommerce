@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Product = require('../models/product');
 
 // create
 exports.createOrUpdateUser = async (req, res) => {
@@ -24,10 +25,14 @@ exports.createOrUpdateUser = async (req, res) => {
 
 // read
 exports.currentUser = async (req, res) => {
-  await User.findOne({ email: req.user.email }).exec((error, user) => {
-    if (error) {
-      throw new Error(error);
-    }
-    return res.json(user);
-  });
+  await User.findOne({ email: req.user.email })
+    .populate({ path: 'cart.product', model: Product })
+    .populate('category')
+    .exec(async (error, user) => {
+      if (error) {
+        throw new Error(error);
+      }
+
+      return res.json(user);
+    });
 };

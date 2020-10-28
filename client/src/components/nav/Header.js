@@ -30,6 +30,8 @@ const Header = () => {
   useEffect(() => {
     if (pathname === '/register/complete') {
       setCurrent('/register');
+    } else if (pathname === '/checkout') {
+      setCurrent('/cart');
     } else {
       setCurrent(pathname);
     }
@@ -60,27 +62,28 @@ const Header = () => {
   return (
     <Affix>
       <Menu selectedKeys={[current]} mode="horizontal">
-        <Item className="m-0 px-3" key="/" icon={<AppstoreOutlined />}>
+        <Item
+          className="float-left m-0 px-3"
+          key="/"
+          icon={<AppstoreOutlined />}
+        >
           <Link to="/">Home</Link>
         </Item>
-        <Item className="m-0 px-3" key="/shop" icon={<ShoppingOutlined />}>
+        <Item
+          className="float-left m-0 px-3"
+          key="/shop"
+          icon={<ShoppingOutlined />}
+        >
           <Link to="/shop">Shop</Link>
         </Item>
-        <Item
-          className="m-0 px-3"
-          key="/cart"
-          icon={<ShoppingCartOutlined />}
-          onClick={handleDrawerToggle}
-        >
-          <Badge count={getCartQuantity()} offset={[12, 0]}>
-            Cart
-          </Badge>
-        </Item>
+        <span className="float-left px-4">
+          <Search />
+        </span>
         {user ? (
           <SubMenu
             icon={<SettingOutlined />}
             title={user.email ? `${user.email}` : 'My Account'}
-            className="float-right"
+            className="float-right m-0 px-3"
           >
             <Item
               className="m-0 px-3"
@@ -120,9 +123,16 @@ const Header = () => {
             </Item>
           </>
         )}
-        <span className="float-right px-1 mt-2">
-          <Search />
-        </span>
+        <Item
+          className="m-0 px-3 float-right"
+          key="/cart"
+          icon={<ShoppingCartOutlined />}
+          onClick={handleDrawerToggle}
+        >
+          <Badge count={getCartQuantity()} offset={[12, 0]}>
+            Cart
+          </Badge>
+        </Item>
       </Menu>
     </Affix>
   );

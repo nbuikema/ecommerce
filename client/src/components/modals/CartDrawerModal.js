@@ -1,13 +1,14 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { updateCart } from '../../api/user';
 
 import ProductCard from '../cards/ProductCard';
 
 import { Drawer } from 'antd';
 
-const CartDrawerModal = ({ children }) => {
-  const { cart, drawer } = useSelector((state) => ({ ...state }));
+const CartDrawerModal = () => {
+  const { cart, drawer, user } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
@@ -18,14 +19,29 @@ const CartDrawerModal = ({ children }) => {
     });
   };
 
+  const emptyCart = () => {
+    user &&
+      updateCart(cart, null, user.token)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+    dispatch({
+      type: 'EMPTY_CART'
+    });
+  };
+
   return (
     <Drawer
       visible={drawer}
       onClose={handleDrawerToggle}
       title="Cart"
       className="text-center"
-      placement="left"
-      width={330}
+      placement="right"
+      width={400}
     >
       {!cart.length ? (
         <p>
@@ -53,6 +69,14 @@ const CartDrawerModal = ({ children }) => {
       >
         Review Order
       </Link>
+      <button
+        to="/cart"
+        className="text-center btn btn-sm btn-danger btn-raised float-right"
+        onClick={emptyCart}
+        disabled={!cart.length}
+      >
+        Empty Cart
+      </button>
     </Drawer>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { updateCart } from '../../api/user';
 
 import ImageModal from '../../components/modals/ImageModal';
 
@@ -13,10 +14,12 @@ const Cart = () => {
 
   const getTotal = () => {
     return parseFloat(
-      cart.reduce((acc, item) => {
-        return acc + item.quantity * item.product.price;
-      }, 0)
-    ).toFixed(2);
+      cart
+        .reduce((acc, item) => {
+          return acc + item.quantity * item.product.price;
+        }, 0)
+        .toFixed(2)
+    );
   };
 
   const handleQuantityChange = (product, e) => {
@@ -26,7 +29,16 @@ const Cart = () => {
     numProduct =
       value > 0 ? (value < product.quantity ? value : product.quantity) : 1;
 
-    numProduct > 0 &&
+    if (numProduct > 0) {
+      user &&
+        updateCart(cart, { product, quantity: numProduct }, user.token)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
       dispatch({
         type: 'CHANGE_QUANTITY',
         payload: {
@@ -34,9 +46,19 @@ const Cart = () => {
           quantity: numProduct
         }
       });
+    }
   };
 
   const handleRemove = (product) => {
+    user &&
+      updateCart(cart, { product, quantity: 0 }, user.token)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
     dispatch({
       type: 'REMOVE_FROM_CART',
       payload: product
@@ -122,9 +144,9 @@ const Cart = () => {
           Total: <b>${parseFloat(getTotal()).toFixed(2)}</b>
           <hr />
           {user ? (
-            <button className="btn btn-lg btn-primary mt-2 w-100">
+            <Link to="/checkout" className="btn btn-lg btn-primary mt-2 w-100">
               Checkout
-            </button>
+            </Link>
           ) : (
             <button className="btn btn-lg btn-danger mt-2 w-100">
               <Link to={{ pathname: '/login', state: { from: 'cart' } }}>

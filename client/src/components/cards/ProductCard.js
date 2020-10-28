@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateCart } from '../../api/user';
 
 import AverageRatingDisplay from '../displays/AverageRatingDisplay';
 
@@ -33,11 +34,22 @@ const ProductCard = ({
     createdAt
   } = product;
 
+  const { cart, user } = useSelector((state) => ({ ...state }));
+
   const dispatch = useDispatch();
 
   const anHourAgo = moment(Date.now() - 60 * 60 * 1000).toDate();
 
   const handleAddToCart = () => {
+    user &&
+      updateCart(cart, { product, quantity: 1 }, user.token)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
     dispatch({
       type: 'ADD_TO_CART',
       payload: { product, quantity: 1 }
@@ -50,6 +62,15 @@ const ProductCard = ({
   };
 
   const handleRemove = (product) => {
+    user &&
+      updateCart(cart, { product, quantity: 0 }, user.token)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
     dispatch({
       type: 'REMOVE_FROM_CART',
       payload: product
@@ -63,7 +84,16 @@ const ProductCard = ({
     numProduct =
       value > 0 ? (value < product.quantity ? value : product.quantity) : 1;
 
-    numProduct > 0 &&
+    if (numProduct > 0) {
+      user &&
+        updateCart(cart, { product, quantity: numProduct }, user.token)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
       dispatch({
         type: 'CHANGE_QUANTITY',
         payload: {
@@ -71,6 +101,7 @@ const ProductCard = ({
           quantity: numProduct
         }
       });
+    }
   };
 
   const showActions = () => {
