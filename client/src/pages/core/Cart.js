@@ -131,7 +131,7 @@ const Cart = () => {
         <div className="col-md-4">
           <h4>Order Summary</h4>
           <hr />
-          <p>Products</p>
+          <h6>Products</h6>
           {cart.map((item, index) => (
             <div key={index}>
               <p>
@@ -141,7 +141,7 @@ const Cart = () => {
             </div>
           ))}
           <hr />
-          Total: <b>${parseFloat(getTotal()).toFixed(2)}</b>
+          <h6>Total: ${parseFloat(getTotal()).toFixed(2)}</h6>
           <hr />
           {user ? (
             <Link to="/checkout" className="btn btn-lg btn-primary mt-2 w-100">

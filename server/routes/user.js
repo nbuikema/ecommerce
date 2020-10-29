@@ -13,7 +13,6 @@ const {
 
 router.get('/read', readUser);
 
-router.get('/read-cart', authCheck, readUserCart);
 router.put('/update-cart', authCheck, updateCart);
 router.put('/update-address', authCheck, updateAddress);
 

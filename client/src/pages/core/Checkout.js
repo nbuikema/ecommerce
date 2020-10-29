@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { readCart, updateAddress } from '../../api/user';
+import { updateAddress } from '../../api/user';
 import { currentUser } from '../../api/auth';
+import { getCoupon } from '../../api/coupon';
+import { toast } from 'react-toastify';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+
+import StripeCheckoutForm from '../../components/forms/StripeCheckoutForm';
 
 import { Form, Input, Button, Select, Tabs } from 'antd';
 const { Option } = Select;
 const { Item } = Form;
 const { Group, TextArea } = Input;
 const { TabPane } = Tabs;
+
+const promise = loadStripe(process.env.REACT_APP_STRIPE_KEY);
 
 const Checkout = () => {
   const [activeTab, setActiveTab] = useState('1');
@@ -21,6 +29,10 @@ const Checkout = () => {
     zip: '',
     additionalInfo: ''
   });
+  const [coupon, setCoupon] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [succeeded, setSucceeded] = useState(false);
+  const [processing, setProcessing] = useState('');
 
   const { cart, user } = useSelector((state) => ({ ...state }));
 
@@ -87,6 +99,22 @@ const Checkout = () => {
 
   const handleChangeTab = (activeKey) => {
     setActiveTab(activeKey);
+  };
+
+  const handleCoupon = () => {
+    getCoupon(coupon)
+      .then((coupon) => {
+        if (coupon.data) {
+          setDiscount(coupon.data.discount);
+
+          toast.success('Coupon Added!');
+        } else {
+          toast.error('Invalid Coupon.');
+        }
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   return (
@@ -280,13 +308,24 @@ const Checkout = () => {
               disabled={!address.address}
             >
               <h4>Payment Info</h4>
+              <Elements stripe={promise}>
+                <StripeCheckoutForm
+                  address={address}
+                  coupon={coupon}
+                  discount={discount}
+                  succeeded={succeeded}
+                  setSucceeded={setSucceeded}
+                  processing={processing}
+                  setProcessing={setProcessing}
+                />
+              </Elements>
             </TabPane>
           </Tabs>
         </div>
         <div className="col-md-4">
           <h4>Order Summary</h4>
           <hr />
-          <p>Products</p>
+          <h6>Products</h6>
           {cart.map((item, index) => (
             <div key={index}>
               <p>
@@ -296,7 +335,41 @@ const Checkout = () => {
             </div>
           ))}
           <hr />
-          Total: <b>${parseFloat(getTotal()).toFixed(2)}</b>
+          <h6>Enter Coupon</h6>
+          <div className="row">
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control"
+                onChange={(e) => setCoupon(e.target.value)}
+                disabled={succeeded || processing}
+              />
+            </div>
+            <div className="col-4">
+              <button
+                onClick={handleCoupon}
+                className="btn btn-primary"
+                disabled={succeeded || processing}
+              >
+                Apply Coupon
+              </button>
+            </div>
+          </div>
+          {discount ? <h6 className="mt-2">Discount: {discount}%</h6> : null}
+          <hr />
+          {discount ? (
+            <>
+              <h6>
+                <s>Total: ${getTotal()}</s>
+              </h6>
+              <h6>
+                New Total: $
+                {parseFloat((getTotal() * (discount / 100)).toFixed(2))}
+              </h6>
+            </>
+          ) : (
+            <h6>Total: ${getTotal()}</h6>
+          )}
         </div>
       </div>
     </div>

@@ -23,11 +23,3 @@ export const updateAddress = async (address, authtoken) => {
     }
   );
 };
-
-export const readCart = async (authtoken) => {
-  return await axios.get(`${process.env.REACT_APP_API}/user/read-cart`, {
-    headers: {
-      authtoken
-    }
-  });
-};

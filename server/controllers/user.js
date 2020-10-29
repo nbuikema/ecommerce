@@ -2,26 +2,6 @@ const User = require('../models/user');
 const Product = require('../models/product');
 const mongoose = require('mongoose');
 
-exports.readUser = (_, res) => {
-  res.json({ data: 'readUser' });
-};
-
-exports.readUserCart = async (req, res) => {
-  const userCart = await User.findOne({ email: req.user.email })
-    .populate({ path: 'cart.product', model: Product })
-    .populate('category')
-    .select('cart')
-    .exec();
-
-  const cartTotal = parseFloat(
-    userCart.cart.reduce((acc, item) => {
-      return acc + item.quantity * item.product.price;
-    }, 0)
-  ).toFixed(2);
-
-  res.json({ userCart, cartTotal });
-};
-
 exports.updateCart = async (req, res) => {
   try {
     const { cart, cartItem } = req.body;
