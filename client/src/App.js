@@ -33,6 +33,8 @@ import UpdateSubcategory from './pages/admin/subcategory/UpdateSubcategory';
 import CreateProduct from './pages/admin/product/CreateProduct';
 import UpdateProduct from './pages/admin/product/UpdateProduct';
 import Products from './pages/admin/product/Products';
+import CreateCoupon from './pages/admin/coupon/CreateCoupon';
+import UpdateCoupon from './pages/admin/coupon/UpdateCoupon';
 
 const App = () => {
   const [ready, setReady] = useState(false);
@@ -151,6 +153,18 @@ const App = () => {
           path="/admin/products"
           ready={ready}
           component={Products}
+        />
+        <AdminRoute
+          exact
+          path="/admin/coupon"
+          ready={ready}
+          component={CreateCoupon}
+        />
+        <AdminRoute
+          exact
+          path="/admin/coupon/:couponName"
+          ready={ready}
+          component={UpdateCoupon}
         />
         <Route exact path="/:categoryType/:slug" component={Category} />
         <Route path="*" exact component={NoPage} />
