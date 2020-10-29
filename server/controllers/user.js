@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Product = require('../models/product');
+const Order = require('../models/order');
 const mongoose = require('mongoose');
 
 exports.updateCart = async (req, res) => {
@@ -55,5 +56,39 @@ exports.updateAddress = async (req, res) => {
     res.json(updated);
   } catch (error) {
     res.status(400).send('Could not update address.');
+  }
+};
+
+exports.createOrder = async (req, res) => {
+  try {
+    const { cart, address, paymentIntent } = req.body;
+
+    const foundUser = await User.findOne({ email: req.user.email }).exec();
+
+    const newOrder = await new Order({
+      products: cart,
+      paymentIntent: paymentIntent.paymentIntent,
+      orderedBy: foundUser._id,
+      address
+    }).save();
+
+    const bulkOption = cart.map((item) => {
+      return {
+        updateOne: {
+          filter: { _id: item.product._id },
+          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+        }
+      };
+    });
+
+    await Product.bulkWrite(bulkOption, {
+      new: true,
+      timestamps: false
+    });
+
+    res.json(newOrder);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send('Could not create order.');
   }
 };

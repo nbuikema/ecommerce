@@ -22,16 +22,14 @@ const CartDrawerModal = () => {
   const emptyCart = () => {
     user &&
       updateCart(cart, null, user.token)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          dispatch({
+            type: 'EMPTY_CART'
+          });
         })
         .catch((error) => {
           console.log(error);
         });
-
-    dispatch({
-      type: 'EMPTY_CART'
-    });
   };
 
   return (

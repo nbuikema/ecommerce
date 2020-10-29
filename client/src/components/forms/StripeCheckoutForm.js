@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { createPaymentIntent } from '../../api/stripe';
+import { createOrder, updateCart } from '../../api/user';
 import { Link } from 'react-router-dom';
 
 import './StripeCheckoutForm.css';
@@ -15,11 +16,13 @@ const StripeCheckoutForm = ({
   processing,
   setProcessing
 }) => {
-  const { user, cart } = useSelector((state) => ({ ...state }));
-
   const [error, setError] = useState(null);
   const [disabled, setDisabled] = useState(true);
   const [clientSecret, setClientSecret] = useState('');
+
+  const { user, cart } = useSelector((state) => ({ ...state }));
+
+  const dispatch = useDispatch();
 
   const stripe = useStripe();
   const elements = useElements();
@@ -54,7 +57,22 @@ const StripeCheckoutForm = ({
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
-      console.log(JSON.stringify(payload, null, 4));
+      createOrder(user.token, cart, address, payload)
+        .then(() => {
+          updateCart(cart, null, user.token)
+            .then(() => {
+              dispatch({
+                type: 'EMPTY_CART'
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       setError(null);
       setProcessing(false);
       setSucceeded(true);

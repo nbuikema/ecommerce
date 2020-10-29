@@ -357,7 +357,7 @@ const Checkout = () => {
           </div>
           {discount ? <h6 className="mt-2">Discount: {discount}%</h6> : null}
           <hr />
-          {discount ? (
+          {discount && cart.length ? (
             <>
               <h6>
                 <s>Total: ${getTotal()}</s>

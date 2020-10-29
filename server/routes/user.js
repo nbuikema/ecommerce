@@ -5,13 +5,12 @@ const { authCheck } = require('../middleware/auth');
 
 // import controllers
 const {
-  readUser,
   updateCart,
-  readUserCart,
-  updateAddress
+  updateAddress,
+  createOrder
 } = require('../controllers/user');
 
-router.get('/read', readUser);
+router.post('/create-order', authCheck, createOrder);
 
 router.put('/update-cart', authCheck, updateCart);
 router.put('/update-address', authCheck, updateAddress);

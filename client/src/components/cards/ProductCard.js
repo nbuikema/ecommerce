@@ -31,7 +31,8 @@ const ProductCard = ({
     images,
     price,
     updatedAt,
-    createdAt
+    createdAt,
+    quantity: productQuantity
   } = product;
 
   const { cart, user } = useSelector((state) => ({ ...state }));
@@ -43,38 +44,34 @@ const ProductCard = ({
   const handleAddToCart = () => {
     user &&
       updateCart(cart, { product, quantity: 1 }, user.token)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          dispatch({
+            type: 'ADD_TO_CART',
+            payload: { product, quantity: 1 }
+          });
+
+          dispatch({
+            type: 'TOGGLE_SHOW',
+            payload: true
+          });
         })
         .catch((error) => {
           console.log(error);
         });
-
-    dispatch({
-      type: 'ADD_TO_CART',
-      payload: { product, quantity: 1 }
-    });
-
-    dispatch({
-      type: 'TOGGLE_SHOW',
-      payload: true
-    });
   };
 
   const handleRemove = (product) => {
     user &&
       updateCart(cart, { product, quantity: 0 }, user.token)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          dispatch({
+            type: 'REMOVE_FROM_CART',
+            payload: product
+          });
         })
         .catch((error) => {
           console.log(error);
         });
-
-    dispatch({
-      type: 'REMOVE_FROM_CART',
-      payload: product
-    });
   };
 
   const handleQuantityChange = (quantityValue, product) => {
@@ -87,20 +84,18 @@ const ProductCard = ({
     if (numProduct > 0) {
       user &&
         updateCart(cart, { product, quantity: numProduct }, user.token)
-          .then((res) => {
-            console.log(res);
+          .then(() => {
+            dispatch({
+              type: 'CHANGE_QUANTITY',
+              payload: {
+                product,
+                quantity: numProduct
+              }
+            });
           })
           .catch((error) => {
             console.log(error);
           });
-
-      dispatch({
-        type: 'CHANGE_QUANTITY',
-        payload: {
-          product,
-          quantity: numProduct
-        }
-      });
     }
   };
 
@@ -124,11 +119,17 @@ const ProductCard = ({
     }
     if (showCustomer) {
       return [
-        <div onClick={handleAddToCart} style={{ cursor: 'pointer' }}>
-          <ShoppingCartOutlined className="text-success" />
+        <a
+          onClick={handleAddToCart}
+          style={{ cursor: 'pointer' }}
+          disabled={productQuantity < 1}
+        >
+          <ShoppingCartOutlined
+            className={productQuantity < 1 ? 'text-danger' : 'text-success'}
+          />
           <br />
-          Add To Cart
-        </div>
+          {productQuantity < 1 ? 'Out of Stock' : 'Add to Cart'}
+        </a>
       ];
     }
     if (showCart) {
@@ -187,12 +188,6 @@ const ProductCard = ({
 
   if (moment(createdAt).toDate() > anHourAgo) {
     return <Ribbon text="New Product!">{card()}</Ribbon>;
-  } else if (moment(updatedAt).toDate() > anHourAgo) {
-    return (
-      <Ribbon text="Just Updated!" color="orange">
-        {card()}
-      </Ribbon>
-    );
   } else {
     return <>{card()}</>;
   }

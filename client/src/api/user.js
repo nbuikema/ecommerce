@@ -23,3 +23,15 @@ export const updateAddress = async (address, authtoken) => {
     }
   );
 };
+
+export const createOrder = async (authtoken, cart, address, paymentIntent) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/user/create-order`,
+    { address, cart, paymentIntent },
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
+};

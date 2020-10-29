@@ -28,6 +28,8 @@ exports.createPaymentIntent = async (req, res) => {
         .toFixed(2)
     );
 
+    console.log(totalFromClient, totalFromServer);
+
     if (totalFromClient === totalFromServer) {
       if (
         req.body.coupon &&
@@ -59,7 +61,7 @@ exports.createPaymentIntent = async (req, res) => {
       currency: 'usd'
     });
 
-    res.send({
+    res.json({
       clientSecret: paymentIntent.client_secret
     });
   } catch (error) {
