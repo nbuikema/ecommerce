@@ -65,12 +65,28 @@ exports.createOrder = async (req, res) => {
 
     const foundUser = await User.findOne({ email: req.user.email }).exec();
 
-    const newOrder = await new Order({
+    const { _id } = await new Order({
       products: cart,
       paymentIntent: paymentIntent.paymentIntent,
       orderedBy: foundUser._id,
       address
     }).save();
+
+    const updatedUser = await User.findOneAndUpdate(
+      {
+        email: req.user.email
+      },
+      { $push: { orders: { _id } }, $set: { cart: [] } },
+      { new: true }
+    )
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'products.product'
+        }
+      })
+      .select('-cart -__v -createdAt -updatedAt')
+      .exec();
 
     const bulkOption = cart.map((item) => {
       return {
@@ -86,7 +102,7 @@ exports.createOrder = async (req, res) => {
       timestamps: false
     });
 
-    res.json(newOrder);
+    res.json(updatedUser);
   } catch (error) {
     console.log(error);
     res.status(400).send('Could not create order.');

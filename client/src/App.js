@@ -47,26 +47,29 @@ const App = () => {
         const { token } = await user.getIdTokenResult();
 
         currentUser(token)
-          .then(({ data: { _id, email, name, role, cart, address } }) => {
-            dispatch({
-              type: 'LOGGED_IN_USER',
-              payload: {
-                _id,
-                email,
-                name,
-                role,
-                address,
-                token
-              }
-            });
+          .then(
+            ({ data: { _id, email, name, role, cart, address, orders } }) => {
+              dispatch({
+                type: 'LOGGED_IN_USER',
+                payload: {
+                  _id,
+                  email,
+                  name,
+                  role,
+                  address,
+                  orders,
+                  token
+                }
+              });
 
-            dispatch({
-              type: 'GET_CART_FROM_DB',
-              payload: cart
-            });
+              dispatch({
+                type: 'GET_CART_FROM_DB',
+                payload: cart
+              });
 
-            setReady(true);
-          })
+              setReady(true);
+            }
+          )
           .catch((error) => {
             toast.error(error);
           });

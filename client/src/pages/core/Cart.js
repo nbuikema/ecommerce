@@ -32,9 +32,7 @@ const Cart = () => {
     if (numProduct > 0) {
       user &&
         updateCart(cart, { product, quantity: numProduct }, user.token)
-          .then((res) => {
-            console.log(res);
-          })
+          .then(() => {})
           .catch((error) => {
             console.log(error);
           });
@@ -52,9 +50,7 @@ const Cart = () => {
   const handleRemove = (product) => {
     user &&
       updateCart(cart, { product, quantity: 0 }, user.token)
-        .then((res) => {
-          console.log(res);
-        })
+        .then(() => {})
         .catch((error) => {
           console.log(error);
         });
@@ -104,7 +100,7 @@ const Cart = () => {
                     onChange={(e) => handleQuantityChange(item.product, e)}
                   />
                 </td>
-                <td>total price</td>
+                <td>${item.product.price * item.quantity}</td>
                 <td className="text-center">
                   <CloseOutlined
                     onClick={() => handleRemove(item.product)}

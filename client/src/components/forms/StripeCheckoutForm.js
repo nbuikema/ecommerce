@@ -58,16 +58,17 @@ const StripeCheckoutForm = ({
       setProcessing(false);
     } else {
       createOrder(user.token, cart, address, payload)
-        .then(() => {
-          updateCart(cart, null, user.token)
-            .then(() => {
-              dispatch({
-                type: 'EMPTY_CART'
-              });
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+        .then(async (res) => {
+          const updateUser = await { ...res.data, token: user.token };
+
+          dispatch({
+            type: 'UPDATE_USER',
+            payload: updateUser
+          });
+
+          dispatch({
+            type: 'EMPTY_CART'
+          });
         })
         .catch((error) => {
           console.log(error);
@@ -106,7 +107,7 @@ const StripeCheckoutForm = ({
     <>
       <p className={succeeded ? 'result-message' : 'result-message hidden'}>
         Payment Successful.{' '}
-        <Link to="/user/history">See it in your purchase history.</Link>
+        <Link to="/user/orders">See it in your purchase history.</Link>
       </p>
 
       <form id="payment-form" className="stripe-form" onSubmit={handleSubmit}>

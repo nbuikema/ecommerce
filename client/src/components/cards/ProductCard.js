@@ -30,7 +30,6 @@ const ProductCard = ({
     description,
     images,
     price,
-    updatedAt,
     createdAt,
     quantity: productQuantity
   } = product;
@@ -44,34 +43,34 @@ const ProductCard = ({
   const handleAddToCart = () => {
     user &&
       updateCart(cart, { product, quantity: 1 }, user.token)
-        .then(() => {
-          dispatch({
-            type: 'ADD_TO_CART',
-            payload: { product, quantity: 1 }
-          });
-
-          dispatch({
-            type: 'TOGGLE_SHOW',
-            payload: true
-          });
-        })
+        .then(() => {})
         .catch((error) => {
           console.log(error);
         });
+
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: { product, quantity: 1 }
+    });
+
+    dispatch({
+      type: 'TOGGLE_SHOW',
+      payload: true
+    });
   };
 
   const handleRemove = (product) => {
     user &&
       updateCart(cart, { product, quantity: 0 }, user.token)
-        .then(() => {
-          dispatch({
-            type: 'REMOVE_FROM_CART',
-            payload: product
-          });
-        })
+        .then(() => {})
         .catch((error) => {
           console.log(error);
         });
+
+    dispatch({
+      type: 'REMOVE_FROM_CART',
+      payload: product
+    });
   };
 
   const handleQuantityChange = (quantityValue, product) => {
@@ -84,18 +83,18 @@ const ProductCard = ({
     if (numProduct > 0) {
       user &&
         updateCart(cart, { product, quantity: numProduct }, user.token)
-          .then(() => {
-            dispatch({
-              type: 'CHANGE_QUANTITY',
-              payload: {
-                product,
-                quantity: numProduct
-              }
-            });
-          })
+          .then(() => {})
           .catch((error) => {
             console.log(error);
           });
+
+      dispatch({
+        type: 'CHANGE_QUANTITY',
+        payload: {
+          product,
+          quantity: numProduct
+        }
+      });
     }
   };
 

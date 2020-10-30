@@ -28,8 +28,6 @@ exports.createPaymentIntent = async (req, res) => {
         .toFixed(2)
     );
 
-    console.log(totalFromClient, totalFromServer);
-
     if (totalFromClient === totalFromServer) {
       if (
         req.body.coupon &&

@@ -28,6 +28,12 @@ exports.currentUser = async (req, res) => {
   await User.findOne({ email: req.user.email })
     .populate({ path: 'cart.product', model: Product })
     .populate('category')
+    .populate({
+      path: 'orders',
+      populate: {
+        path: 'products.product'
+      }
+    })
     .exec(async (error, user) => {
       if (error) {
         throw new Error(error);
