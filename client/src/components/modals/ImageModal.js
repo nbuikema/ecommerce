@@ -84,6 +84,7 @@ const RatingModal = ({ title, images }) => {
         footer={null}
         onCancel={() => setModalVisible(false)}
         maskTransitionName=""
+        destroyOnClose={true}
       >
         {showImages()}
       </Modal>

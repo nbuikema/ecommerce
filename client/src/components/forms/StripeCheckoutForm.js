@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useSelector, useDispatch } from 'react-redux';
 import { createPaymentIntent } from '../../api/stripe';
-import { createOrder, updateCart } from '../../api/user';
+import { createOrder } from '../../api/user';
 import { Link } from 'react-router-dom';
 
 import './StripeCheckoutForm.css';

@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 
 import UserNav from '../../components/nav/UserNav';
 import ImageModal from '../../components/modals/ImageModal';
+import Invoice from '../../components/invoice/Invoice';
 
 const Orders = () => {
+  const [ready, setReady] = useState(false);
+
   const { user } = useSelector((state) => ({ ...state }));
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
+  const showDownloadLink = (order) => (
+    <PDFDownloadLink
+      document={<Invoice order={order} />}
+      fileName="invoice.pdf"
+      className="btn btn-sm btn-outline-primary"
+    >
+      Download Invoice
+    </PDFDownloadLink>
+  );
 
   return (
     <div className="container-fluid">
@@ -18,7 +36,12 @@ const Orders = () => {
           <h4>My Orders</h4>
           {user.orders.map((order, index) => (
             <div key={index} className="m-5 p-3 card">
-              <h5>Order ID: {order._id}</h5>
+              <h5>
+                Order ID: {order._id}
+                <span className="float-right">
+                  {ready && showDownloadLink(order)}
+                </span>
+              </h5>
               <h6>Order Details</h6>
               <table className="table table-bordered">
                 <thead className="thead-light">
