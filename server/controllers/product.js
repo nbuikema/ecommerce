@@ -199,6 +199,22 @@ exports.searchFilters = async (req, res) => {
   }
 };
 
+exports.getProductsBySoldValue = async (_, res) => {
+  const products = await Product.aggregate([
+    {
+      $project: {
+        document: '$$ROOT',
+        soldValue: {
+          $multiply: ['$price', '$sold']
+        }
+      }
+    },
+    { $sort: { soldValue: -1 } }
+  ]).exec();
+
+  res.json(products);
+};
+
 // update
 exports.update = async (req, res) => {
   try {

@@ -35,6 +35,7 @@ import UpdateProduct from './pages/admin/product/UpdateProduct';
 import Products from './pages/admin/product/Products';
 import CreateCoupon from './pages/admin/coupon/CreateCoupon';
 import UpdateCoupon from './pages/admin/coupon/UpdateCoupon';
+import AdminOrders from './pages/admin/order/AdminOrders';
 
 const App = () => {
   const [ready, setReady] = useState(false);
@@ -171,6 +172,12 @@ const App = () => {
           path="/admin/coupon/:couponName"
           ready={ready}
           component={UpdateCoupon}
+        />
+        <AdminRoute
+          exact
+          path="/admin/orders"
+          ready={ready}
+          component={AdminOrders}
         />
         <Route exact path="/:categoryType/:slug" component={Category} />
         <Route path="*" exact component={NoPage} />

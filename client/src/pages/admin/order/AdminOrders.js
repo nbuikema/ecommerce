@@ -1,47 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { getAllOrders, updateOrder } from '../../../api/order';
+import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 
-import UserNav from '../../components/nav/UserNav';
-import ImageModal from '../../components/modals/ImageModal';
-import Invoice from '../../components/invoice/Invoice';
+import AdminNav from '../../../components/nav/AdminNav';
+import ImageModal from '../../../components/modals/ImageModal';
 
-const Orders = () => {
-  const [ready, setReady] = useState(false);
+import { Select } from 'antd';
+const { Option } = Select;
 
-  const { user } = useSelector((state) => ({ ...state }));
+const AdminOrders = () => {
+  const [orders, setOrders] = useState([]);
+
+  const {
+    user: { token }
+  } = useSelector((state) => ({ ...state }));
+
+  const memoizedloadOrders = useCallback(() => {
+    getAllOrders(token)
+      .then((res) => {
+        setOrders(res.data);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+  }, [token]);
 
   useEffect(() => {
-    setReady(true);
-  }, []);
+    memoizedloadOrders();
+  }, [memoizedloadOrders]);
 
-  const showDownloadLink = (order) => (
-    <PDFDownloadLink
-      document={<Invoice order={order} />}
-      fileName="invoice.pdf"
-      className="btn btn-sm btn-outline-primary"
-    >
-      Download Invoice
-    </PDFDownloadLink>
-  );
+  const handleUpdateOrder = (value, order) => {
+    updateOrder(token, order._id, value).then((res) => {
+      memoizedloadOrders();
+
+      toast.success(
+        `Order ${res.data._id} status updated to '${res.data.orderStatus}'`
+      );
+    });
+  };
 
   return (
     <div className="container-fluid">
       <div className="row">
         <div className="col-md-2">
-          <UserNav />
+          <AdminNav />
         </div>
         <div className="col">
-          <h4>My Orders</h4>
-          {user.orders.map((order, index) => (
+          <h4>Orders</h4>
+          {orders.map((order, index) => (
             <div key={index} className="m-5 p-3 card">
-              <h5>
-                Order ID: {order._id}
-                <span className="float-right">
-                  {ready && showDownloadLink(order)}
-                </span>
-              </h5>
+              <h5>Order ID: {order._id}</h5>
               <h6>Order Details</h6>
               <table className="table table-bordered">
                 <thead className="thead-light">
@@ -55,24 +65,22 @@ const Orders = () => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td
-                      className={`bg-${
-                        order.orderStatus === 'Received' ? 'light' : ''
-                      }${
-                        order.orderStatus === 'Processing' ? 'secondary' : ''
-                      }${order.orderStatus === 'Shipped' ? 'primary' : ''}${
-                        order.orderStatus === 'Delivered' ? 'info' : ''
-                      }${order.orderStatus === 'Completed' ? 'success' : ''}${
-                        order.orderStatus === 'Cancelled' ? 'danger' : ''
-                      }${order.orderStatus === 'Delayed' ? 'warning' : ''}`}
-                    >
-                      <h5
-                        className={`m-0 ${
-                          order.orderStatus === 'Received' ? '' : 'text-white'
-                        }`}
-                      >
-                        {order.orderStatus}
-                      </h5>
+                    <td>
+                      <h4>
+                        <Select
+                          defaultValue={order.orderStatus}
+                          onChange={(value) => handleUpdateOrder(value, order)}
+                          size="large"
+                        >
+                          <Option value="Received">Received</Option>
+                          <Option value="Processing">Processing</Option>
+                          <Option value="Shipped">Shipped</Option>
+                          <Option value="Delivered">Delivered</Option>
+                          <Option value="Completed">Completed</Option>
+                          <Option value="Cancelled">Cancelled</Option>
+                          <Option value="Delayed">Delayed</Option>
+                        </Select>
+                      </h4>
                     </td>
                     <td>
                       {moment(order.createdAt).format('MM/DD/YYYY @ hh:mm a z')}
@@ -106,7 +114,7 @@ const Orders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {user.orders[index].products.map((item, index) => (
+                  {orders[index].products.map((item, index) => (
                     <tr key={index}>
                       <td className="text-center">
                         {item.product.images.length ? (
@@ -134,4 +142,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default AdminOrders;
