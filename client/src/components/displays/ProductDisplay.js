@@ -1,13 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import StarRatings from 'react-star-ratings';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToWishlist, updateCart, removeFromWishlist } from '../../api/user';
+import { toast } from 'react-toastify';
 
 import RatingModal from '../../components/modals/RatingModal';
 import AverageRatingDisplay from './AverageRatingDisplay';
 
 import { Card, Tabs } from 'antd';
-import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import {
+  HeartOutlined,
+  HeartFilled,
+  ShoppingCartOutlined
+} from '@ant-design/icons';
 const { TabPane } = Tabs;
 
 const ProductDisplay = ({
@@ -28,9 +34,18 @@ const ProductDisplay = ({
     quantity
   } = product;
 
+  const { cart, user } = useSelector((state) => ({ ...state }));
+
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
+    user &&
+      updateCart(cart, { product, quantity: 1 }, user.token)
+        .then(() => {})
+        .catch((error) => {
+          console.log(error);
+        });
+
     dispatch({
       type: 'ADD_TO_CART',
       payload: { product, quantity: 1 }
@@ -40,6 +55,38 @@ const ProductDisplay = ({
       type: 'TOGGLE_SHOW',
       payload: true
     });
+  };
+
+  const handleWishlist = () => {
+    user && user.token && user.wishlist.find((p) => p._id === _id)
+      ? removeFromWishlist(user.token, _id)
+          .then(async (res) => {
+            const updateUser = await { ...res.data, token: user.token };
+
+            dispatch({
+              type: 'UPDATE_USER',
+              payload: updateUser
+            });
+
+            toast.success(`${title} has been removed from your wishlist!`);
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      : addToWishlist(user.token, _id)
+          .then(async (res) => {
+            const updateUser = await { ...res.data, token: user.token };
+
+            dispatch({
+              type: 'UPDATE_USER',
+              payload: updateUser
+            });
+
+            toast.success(`${title} has been added to your wishlist!`);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
   };
 
   const showImages = () => (
@@ -114,16 +161,37 @@ const ProductDisplay = ({
         <Card
           className="mt-3"
           actions={[
-            <div onClick={handleAddToCart} style={{ cursor: 'pointer' }}>
-              <ShoppingCartOutlined className="text-success" />
+            <button
+              onClick={handleAddToCart}
+              disabled={quantity < 1}
+              className="w-100 h-100 m-0 p-0"
+              style={{
+                cursor: 'pointer',
+                border: 'none',
+                backgroundColor: 'inherit'
+              }}
+            >
+              <ShoppingCartOutlined
+                className={quantity < 1 ? 'text-danger' : 'text-success'}
+              />
               <br />
-              Add To Cart
+              {quantity < 1 ? 'Out of Stock' : 'Add to Cart'}
+            </button>,
+            <div onClick={handleWishlist} style={{ cursor: 'pointer' }}>
+              {user &&
+              user.token &&
+              user.wishlist.find((p) => p._id === _id) ? (
+                <HeartFilled className="text-info" />
+              ) : (
+                <HeartOutlined className="text-info" />
+              )}
+              <br />
+              {user && user.token
+                ? user.wishlist.find((p) => p._id === _id)
+                  ? 'Remove from Wishlist'
+                  : 'Add to Wishlist'
+                : 'Login to Leave Rating'}
             </div>,
-            <>
-              <HeartOutlined className="text-info" />
-              <br />
-              Add To Wishlist
-            </>,
             <RatingModal
               handleSubmitRating={handleSubmitRating}
               product={_id}

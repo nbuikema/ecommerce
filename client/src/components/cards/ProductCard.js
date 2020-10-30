@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateCart } from '../../api/user';
+import { updateCart, addToWishlist, removeFromWishlist } from '../../api/user';
+import { toast } from 'react-toastify';
 
 import AverageRatingDisplay from '../displays/AverageRatingDisplay';
 
@@ -11,7 +12,9 @@ import {
   EditOutlined,
   DeleteOutlined,
   ShoppingCartOutlined,
-  CloseOutlined
+  CloseOutlined,
+  HeartFilled,
+  HeartOutlined
 } from '@ant-design/icons';
 const { Meta } = Card;
 const { Ribbon } = Badge;
@@ -25,6 +28,7 @@ const ProductCard = ({
   quantity
 }) => {
   const {
+    _id,
     title,
     slug,
     description,
@@ -38,9 +42,13 @@ const ProductCard = ({
 
   const dispatch = useDispatch();
 
+  const history = useHistory();
+
   const anHourAgo = moment(Date.now() - 60 * 60 * 1000).toDate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+
     user &&
       updateCart(cart, { product, quantity: 1 }, user.token)
         .then(() => {})
@@ -98,6 +106,40 @@ const ProductCard = ({
     }
   };
 
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+
+    user && user.token && user.wishlist.find((p) => p._id === _id)
+      ? removeFromWishlist(user.token, _id)
+          .then(async (res) => {
+            const updateUser = await { ...res.data, token: user.token };
+
+            dispatch({
+              type: 'UPDATE_USER',
+              payload: updateUser
+            });
+
+            toast.success(`${title} has been removed from your wishlist!`);
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      : addToWishlist(user.token, _id)
+          .then(async (res) => {
+            const updateUser = await { ...res.data, token: user.token };
+
+            dispatch({
+              type: 'UPDATE_USER',
+              payload: updateUser
+            });
+
+            toast.success(`${title} has been added to your wishlist!`);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+  };
+
   const showActions = () => {
     if (showAdmin) {
       return [
@@ -118,17 +160,35 @@ const ProductCard = ({
     }
     if (showCustomer) {
       return [
-        <a
+        <button
           onClick={handleAddToCart}
-          style={{ cursor: 'pointer' }}
           disabled={productQuantity < 1}
+          className="w-100 h-100 m-0 p-0"
+          style={{
+            cursor: 'pointer',
+            border: 'none',
+            backgroundColor: 'inherit'
+          }}
         >
           <ShoppingCartOutlined
             className={productQuantity < 1 ? 'text-danger' : 'text-success'}
           />
           <br />
           {productQuantity < 1 ? 'Out of Stock' : 'Add to Cart'}
-        </a>
+        </button>,
+        <div onClick={handleWishlist} style={{ cursor: 'pointer' }}>
+          {user && user.token && user.wishlist.find((p) => p._id === _id) ? (
+            <HeartFilled className="text-info" />
+          ) : (
+            <HeartOutlined className="text-info" />
+          )}
+          <br />
+          {user && user.token
+            ? user.wishlist.find((p) => p._id === _id)
+              ? 'Remove from Wishlist'
+              : 'Add to Wishlist'
+            : 'Login to Leave Rating'}
+        </div>
       ];
     }
     if (showCart) {
@@ -156,33 +216,38 @@ const ProductCard = ({
   };
 
   const card = () => (
-    <Card
-      hoverable
-      cover={
-        <>
-          {!showCart && (
-            <div className="mt-3 mb-1">
-              <AverageRatingDisplay product={product} />
-            </div>
-          )}
-          <img
-            alt={title}
-            src={images && images.length > 0 ? images[0].url : ''}
-            style={{ height: '180px', objectFit: 'cover' }}
-            className="p-1"
-          />
-        </>
-      }
-      actions={showActions()}
-      className="d-flex flex-column w-100"
+    <div
+      className="d-flex w-100"
+      onClick={() => history.push(`/product/${slug}`)}
     >
-      <Meta
-        title={`${title} - $${price}`}
-        description={`${
-          !showCart ? description && description.substring(0, 100) : ''
-        }${!showCart && description.length > 100 ? '...' : ''}`}
-      />
-    </Card>
+      <Card
+        hoverable
+        cover={
+          <>
+            {!showCart && (
+              <div className="mt-3 mb-1">
+                <AverageRatingDisplay product={product} />
+              </div>
+            )}
+            <img
+              alt={title}
+              src={images && images.length > 0 ? images[0].url : ''}
+              style={{ height: '180px', objectFit: 'cover' }}
+              className="p-1"
+            />
+          </>
+        }
+        actions={showActions()}
+        className="d-flex flex-column w-100"
+      >
+        <Meta
+          title={`${title} - $${price}`}
+          description={`${
+            !showCart ? description && description.substring(0, 100) : ''
+          }${!showCart && description.length > 100 ? '...' : ''}`}
+        />
+      </Card>
+    </div>
   );
 
   if (moment(createdAt).toDate() > anHourAgo) {

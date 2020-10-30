@@ -48,7 +48,9 @@ const App = () => {
 
         currentUser(token)
           .then(
-            ({ data: { _id, email, name, role, cart, address, orders } }) => {
+            ({
+              data: { _id, email, name, role, cart, address, orders, wishlist }
+            }) => {
               dispatch({
                 type: 'LOGGED_IN_USER',
                 payload: {
@@ -58,6 +60,7 @@ const App = () => {
                   role,
                   address,
                   orders,
+                  wishlist,
                   token
                 }
               });

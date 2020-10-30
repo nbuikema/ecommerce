@@ -28,6 +28,7 @@ exports.currentUser = async (req, res) => {
   await User.findOne({ email: req.user.email })
     .populate({ path: 'cart.product', model: Product })
     .populate('category')
+    .populate('wishlist')
     .populate({
       path: 'orders',
       populate: {

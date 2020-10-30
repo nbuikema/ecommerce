@@ -108,3 +108,59 @@ exports.createOrder = async (req, res) => {
     res.status(400).send('Could not create order.');
   }
 };
+
+exports.addToWishlist = async (req, res) => {
+  try {
+    const { productId } = req.body;
+
+    const updatedUser = await User.findOneAndUpdate(
+      { email: req.user.email },
+      { $addToSet: { wishlist: productId } },
+      { new: true }
+    )
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'products.product'
+        }
+      })
+      .populate('wishlist')
+      .select('-cart -__v -createdAt -updatedAt')
+      .exec();
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send('Could not add to wishlist.');
+  }
+};
+
+exports.readWishlist = async (req, res) => {
+  const wishlist = await (await User.findOne({ email: req.user.email }))
+    .isSelected('wishlist')
+    .populate('wishlist')
+    .exec();
+
+  res.json(wishlist);
+};
+
+exports.removeFromWishlist = async (req, res) => {
+  const { productId } = req.params;
+
+  const updatedUser = await User.findOneAndUpdate(
+    { email: req.user.email },
+    { $pull: { wishlist: productId } },
+    { new: true }
+  )
+    .populate({
+      path: 'orders',
+      populate: {
+        path: 'products.product'
+      }
+    })
+    .populate('wishlist')
+    .select('-cart -__v -createdAt -updatedAt')
+    .exec();
+
+  res.json(updatedUser);
+};

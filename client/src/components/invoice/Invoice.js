@@ -7,7 +7,6 @@ import {
   TableBody,
   DataTableCell
 } from '@david.kucsai/react-pdf-table';
-import moment from 'moment';
 
 const styles = StyleSheet.create({
   body: {

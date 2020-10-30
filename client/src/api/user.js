@@ -35,3 +35,37 @@ export const createOrder = async (authtoken, cart, address, paymentIntent) => {
     }
   );
 };
+
+export const getWishlist = async (authtoken) => {
+  return await axios.get(`${process.env.REACT_APP_API}/user/wishlist`, {
+    headers: {
+      authtoken
+    }
+  });
+};
+
+export const addToWishlist = async (authtoken, productId) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/user/wishlist`,
+    {
+      productId
+    },
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
+};
+
+export const removeFromWishlist = async (authtoken, productId) => {
+  return await axios.put(
+    `${process.env.REACT_APP_API}/user/wishlist/${productId}`,
+    {},
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
+};

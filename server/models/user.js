@@ -23,8 +23,8 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: []
     },
-    orders: [{ type: ObjectId, ref: 'Order' }]
-    //wishlist: [{ type: ObjectId, ref: 'Product' }]
+    orders: [{ type: ObjectId, ref: 'Order' }],
+    wishlist: [{ type: ObjectId, ref: 'Product' }]
   },
   { timestamps: true }
 );

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { Modal } from 'antd';
-import { StarOutlined } from '@ant-design/icons';
+import { StarOutlined, StarFilled } from '@ant-design/icons';
 
 const RatingModal = ({ children, handleSubmitRating, product, rating }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,7 +28,11 @@ const RatingModal = ({ children, handleSubmitRating, product, rating }) => {
   return (
     <>
       <div onClick={handleModal}>
-        <StarOutlined className="text-danger" />
+        {user && user.token && rating === 0 ? (
+          <StarOutlined className="text-danger" />
+        ) : (
+          <StarFilled className="text-danger" />
+        )}
         <br />
         {user && user.token
           ? rating === 0
