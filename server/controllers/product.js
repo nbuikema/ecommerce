@@ -4,6 +4,7 @@ const Category = require('../models/category');
 const Subcategory = require('../models/subcategory');
 const Order = require('../models/order');
 const slugify = require('slugify');
+const moment = require('moment');
 
 // create
 exports.create = async (req, res) => {
@@ -201,16 +202,56 @@ exports.searchFilters = async (req, res) => {
 };
 
 exports.getProductsBySoldValue = async (req, res) => {
-  const {
-    date: { year, month, day }
-  } = req.body;
+  const { date } = req.body;
 
-  const orders = await Order.find({
-    createdAt: { $gte: new Date(year, month, day) }
-  })
-    .select('products')
-    .populate('products.product')
-    .exec();
+  let query, sort;
+
+  if (date === 'Overall') {
+    query = { orderedYear: { $gte: 0 } };
+    sort = { orderedYear: 1 };
+  }
+  if (date === 'This Year') {
+    query = { orderedYear: { $eq: new Date().getFullYear() } };
+    sort = { orderedMonth: 1 };
+  }
+  if (date === 'This Month') {
+    query = { orderedMonth: { $eq: new Date().getMonth() + 1 } };
+    sort = { orderedDayOfMonth: 1 };
+  }
+  if (date === 'This Week') {
+    query = { orderedWeek: { $eq: moment(new Date()).week() - 1 } };
+    sort = { orderedDayOfWeek: 1 };
+  }
+  if (date === 'Today') {
+    query = {
+      orderedYear: { $eq: new Date().getFullYear() },
+      orderedMonth: { $eq: new Date().getMonth() + 1 },
+      orderedDayOfMonth: { $eq: new Date().getDate() }
+    };
+    sort = { orderedDayOfMonth: 1 };
+  }
+
+  const orders = await Order.aggregate([
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'products.product',
+        foreignField: '_id',
+        as: 'productsList'
+      }
+    },
+    {
+      $addFields: {
+        orderedMonth: { $month: '$createdAt' },
+        orderedDayOfMonth: { $dayOfMonth: '$createdAt' },
+        orderedYear: { $year: '$createdAt' },
+        orderedWeek: { $week: '$createdAt' },
+        orderedDayOfWeek: { $dayOfWeek: '$createdAt' }
+      }
+    },
+    { $match: query },
+    { $sort: sort }
+  ]);
 
   let productsBySoldValue = [];
 
@@ -219,25 +260,26 @@ exports.getProductsBySoldValue = async (req, res) => {
     let totalPrice = 0;
     let quantitySold = 0;
 
-    order.products.forEach((product) => {
+    order.productsList.forEach((product, index) => {
       const existsIndex = productsBySoldValue.findIndex(
-        (x) => x.title === product.product.title
+        (x) => x.title === product.title
       );
 
       if (existsIndex > -1) {
-        productsBySoldValue[existsIndex].quantitySold += product.quantity;
+        productsBySoldValue[existsIndex].quantitySold +=
+          order.products[index].quantity;
         productsBySoldValue[existsIndex].totalPrice = parseFloat(
           (
-            product.product.price * product.quantity +
+            product.price * order.products[index].quantity +
             productsBySoldValue[existsIndex].totalPrice
           ).toFixed(2)
         );
       } else {
-        title = product.product.title;
+        title = product.title;
         totalPrice = parseFloat(
-          (product.product.price * product.quantity).toFixed(2)
+          (product.price * order.products[index].quantity).toFixed(2)
         );
-        quantitySold = product.quantity;
+        quantitySold = order.products[index].quantity;
 
         productsBySoldValue.push({ title, totalPrice, quantitySold });
       }

@@ -22,58 +22,25 @@ const { Option } = Select;
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [date, setDate] = useState({
-    year: 0,
-    month: 0,
-    day: 0
-  });
-  const [dateSelect, setDateSelect] = useState('All Time');
+  const [date, setDate] = useState('Overall');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
+
     getProductsBySoldValue(date).then((res) => {
       setProducts(res.data);
+      setLoading(false);
     });
 
     getOrdersByDate(date).then((res) => {
       setOrders(res.data);
+      setLoading(false);
     });
   }, [date]);
 
   const handleChangeDate = (value) => {
-    setDateSelect(value);
-
-    switch (value) {
-      case 'All Time':
-        return setDate({
-          year: 0,
-          month: 0,
-          day: 0
-        });
-      case 'Past Year':
-        return setDate({
-          year: new Date().getFullYear() - 1,
-          month: new Date().getMonth(),
-          day: new Date().getDate()
-        });
-      case 'Past Month':
-        return setDate({
-          year: new Date().getFullYear(),
-          month: new Date().getMonth() - 1,
-          day: new Date().getDate() - 1
-        });
-      case 'Past Week':
-        return setDate({
-          year: new Date().getFullYear(),
-          month: new Date().getMonth(),
-          day: new Date().getDate() - 7
-        });
-      case 'Today':
-        return setDate({
-          year: new Date().getFullYear(),
-          month: new Date().getMonth(),
-          day: new Date().getDate()
-        });
-    }
+    setDate(value);
   };
 
   return (
@@ -91,15 +58,16 @@ const AdminDashboard = () => {
                 Best Selling Products
                 <span>
                   <Select
-                    value={dateSelect}
+                    value={date}
                     style={{ width: 120 }}
                     onChange={handleChangeDate}
                     className="mx-3"
+                    disabled={loading}
                   >
-                    <Option value="All Time">All Time</Option>
-                    <Option value="Past Year">Past Year</Option>
-                    <Option value="Past Month">Past Month</Option>
-                    <Option value="Past Week">Past Week</Option>
+                    <Option value="Overall">Overall</Option>
+                    <Option value="This Year">This Year</Option>
+                    <Option value="This Month">This Month</Option>
+                    <Option value="This Week">This Week</Option>
                     <Option value="Today">Today</Option>
                   </Select>
                 </span>
@@ -120,27 +88,36 @@ const AdminDashboard = () => {
                 Orders
                 <span>
                   <Select
-                    value={dateSelect}
+                    value={date}
                     style={{ width: 120 }}
                     onChange={handleChangeDate}
                     className="mx-3"
+                    disabled={loading}
                   >
-                    <Option value="All Time">All Time</Option>
-                    <Option value="Past Year">Past Year</Option>
-                    <Option value="Past Month">Past Month</Option>
-                    <Option value="Past Week">Past Week</Option>
+                    <Option value="Overall">Overall</Option>
+                    <Option value="This Year">This Year</Option>
+                    <Option value="This Month">This Month</Option>
+                    <Option value="This Week">This Week</Option>
                     <Option value="Today">Today</Option>
                   </Select>
                 </span>
               </h5>
+              <BarChart width={500} height={300} data={orders}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="dateGroup" />
+                <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                <Tooltip />
+                <Legend />
+                <Bar yAxisId="left" dataKey="numOrders" fill="#8884d8" />
+              </BarChart>
               <AreaChart width={500} height={400} data={orders}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis dataKey="dateGroup" />
                 <YAxis />
                 <Tooltip />
                 <Area
                   type="monotone"
-                  dataKey="orders"
+                  dataKey="numOrders"
                   stroke="#8884d8"
                   fill="#8884d8"
                 />
