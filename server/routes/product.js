@@ -33,7 +33,7 @@ router.get('/related/:productId', listRelated);
 router.get('/by/category/:categorySlug', listAllInCategory);
 router.get('/by/subcategory/:subcategorySlug', listAllInSubcategory);
 router.post('/search/filters', searchFilters);
-router.get('/sold-value', getProductsBySoldValue);
+router.post('/sold-value', getProductsBySoldValue);
 
 // update
 router.put('/update/:slug', authCheck, adminCheck, update);

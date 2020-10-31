@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const User = require('../models/user');
 const Category = require('../models/category');
 const Subcategory = require('../models/subcategory');
+const Order = require('../models/order');
 const slugify = require('slugify');
 
 // create
@@ -199,20 +200,53 @@ exports.searchFilters = async (req, res) => {
   }
 };
 
-exports.getProductsBySoldValue = async (_, res) => {
-  const products = await Product.aggregate([
-    {
-      $project: {
-        document: '$$ROOT',
-        soldValue: {
-          $multiply: ['$price', '$sold']
-        }
-      }
-    },
-    { $sort: { soldValue: -1 } }
-  ]).exec();
+exports.getProductsBySoldValue = async (req, res) => {
+  const {
+    date: { year, month, day }
+  } = req.body;
 
-  res.json(products);
+  const orders = await Order.find({
+    createdAt: { $gte: new Date(year, month, day) }
+  })
+    .select('products')
+    .populate('products.product')
+    .exec();
+
+  let productsBySoldValue = [];
+
+  orders.forEach((order) => {
+    let title = '';
+    let totalPrice = 0;
+    let quantitySold = 0;
+
+    order.products.forEach((product) => {
+      const existsIndex = productsBySoldValue.findIndex(
+        (x) => x.title === product.product.title
+      );
+
+      if (existsIndex > -1) {
+        productsBySoldValue[existsIndex].quantitySold += product.quantity;
+        productsBySoldValue[existsIndex].totalPrice = parseFloat(
+          (
+            product.product.price * product.quantity +
+            productsBySoldValue[existsIndex].totalPrice
+          ).toFixed(2)
+        );
+      } else {
+        title = product.product.title;
+        totalPrice = parseFloat(
+          (product.product.price * product.quantity).toFixed(2)
+        );
+        quantitySold = product.quantity;
+
+        productsBySoldValue.push({ title, totalPrice, quantitySold });
+      }
+    });
+  });
+
+  productsBySoldValue.sort((a, b) => b.totalPrice - a.totalPrice);
+
+  res.json(productsBySoldValue);
 };
 
 // update

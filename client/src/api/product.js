@@ -60,8 +60,10 @@ export const getProductsWithFilter = async (args) => {
   );
 };
 
-export const getProductsBySoldValue = async () => {
-  return await axios.get(`${process.env.REACT_APP_API}/product/sold-value`);
+export const getProductsBySoldValue = async (date) => {
+  return await axios.post(`${process.env.REACT_APP_API}/product/sold-value`, {
+    date
+  });
 };
 
 // update product

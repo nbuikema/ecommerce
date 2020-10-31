@@ -4,9 +4,14 @@ const router = express.Router();
 const { authCheck, adminCheck } = require('../middleware/auth');
 
 // import controllers
-const { listOrders, updateOrder } = require('../controllers/order');
+const {
+  listOrders,
+  updateOrder,
+  getOrdersByDate
+} = require('../controllers/order');
 
 router.get('/all', authCheck, adminCheck, listOrders);
+router.post('/by-date', getOrdersByDate);
 
 router.put('/update/:orderId', authCheck, adminCheck, updateOrder);
 
