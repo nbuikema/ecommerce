@@ -202,25 +202,27 @@ exports.searchFilters = async (req, res) => {
 };
 
 exports.getProductsBySoldValue = async (req, res) => {
-  const { date } = req.body;
+  const { date, sort } = req.body;
 
-  let query, sort;
+  let query;
 
   if (date === 'Overall') {
     query = { orderedYear: { $gte: 0 } };
-    sort = { orderedYear: 1 };
   }
   if (date === 'This Year') {
     query = { orderedYear: { $eq: new Date().getFullYear() } };
-    sort = { orderedMonth: 1 };
   }
   if (date === 'This Month') {
-    query = { orderedMonth: { $eq: new Date().getMonth() + 1 } };
-    sort = { orderedDayOfMonth: 1 };
+    query = {
+      orderedMonth: { $eq: new Date().getMonth() + 1 },
+      orderedYear: { $eq: new Date().getFullYear() }
+    };
   }
   if (date === 'This Week') {
-    query = { orderedWeek: { $eq: moment(new Date()).week() - 1 } };
-    sort = { orderedDayOfWeek: 1 };
+    query = {
+      orderedWeek: { $eq: moment(new Date()).week() - 1 },
+      orderedYear: { $eq: new Date().getFullYear() }
+    };
   }
   if (date === 'Today') {
     query = {
@@ -228,7 +230,6 @@ exports.getProductsBySoldValue = async (req, res) => {
       orderedMonth: { $eq: new Date().getMonth() + 1 },
       orderedDayOfMonth: { $eq: new Date().getDate() }
     };
-    sort = { orderedDayOfMonth: 1 };
   }
 
   const orders = await Order.aggregate([
@@ -249,16 +250,15 @@ exports.getProductsBySoldValue = async (req, res) => {
         orderedDayOfWeek: { $dayOfWeek: '$createdAt' }
       }
     },
-    { $match: query },
-    { $sort: sort }
+    { $match: query }
   ]);
 
   let productsBySoldValue = [];
 
   orders.forEach((order) => {
     let title = '';
-    let totalPrice = 0;
-    let quantitySold = 0;
+    let total = 0;
+    let sold = 0;
 
     order.productsList.forEach((product, index) => {
       const existsIndex = productsBySoldValue.findIndex(
@@ -266,27 +266,40 @@ exports.getProductsBySoldValue = async (req, res) => {
       );
 
       if (existsIndex > -1) {
-        productsBySoldValue[existsIndex].quantitySold +=
-          order.products[index].quantity;
-        productsBySoldValue[existsIndex].totalPrice = parseFloat(
+        productsBySoldValue[existsIndex].sold += order.products[index].quantity;
+        productsBySoldValue[existsIndex].total = parseFloat(
           (
             product.price * order.products[index].quantity +
-            productsBySoldValue[existsIndex].totalPrice
+            productsBySoldValue[existsIndex].total
           ).toFixed(2)
         );
       } else {
         title = product.title;
-        totalPrice = parseFloat(
+        total = parseFloat(
           (product.price * order.products[index].quantity).toFixed(2)
         );
-        quantitySold = order.products[index].quantity;
+        sold = order.products[index].quantity;
 
-        productsBySoldValue.push({ title, totalPrice, quantitySold });
+        productsBySoldValue.push({ title, total, sold });
       }
     });
   });
 
-  productsBySoldValue.sort((a, b) => b.totalPrice - a.totalPrice);
+  if (sort === 'Total Price - High to Low') {
+    productsBySoldValue.sort((a, b) => b.total - a.total);
+  }
+
+  if (sort === 'Total Price - Low to High') {
+    productsBySoldValue.sort((a, b) => a.total - b.total);
+  }
+
+  if (sort === 'Number Sold - High to Low') {
+    productsBySoldValue.sort((a, b) => b.sold - a.sold);
+  }
+
+  if (sort === 'Number Sold - Low to High') {
+    productsBySoldValue.sort((a, b) => a.sold - b.sold);
+  }
 
   res.json(productsBySoldValue);
 };

@@ -24,12 +24,13 @@ const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [date, setDate] = useState('Overall');
+  const [sort, setSort] = useState('Total Price - High to Low');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
 
-    getProductsBySoldValue(date).then((res) => {
+    getProductsBySoldValue(date, sort).then((res) => {
       setProducts(res.data);
       setLoading(false);
     });
@@ -38,11 +39,7 @@ const AdminDashboard = () => {
       setOrders(res.data);
       setLoading(false);
     });
-  }, [date]);
-
-  const handleChangeDate = (value) => {
-    setDate(value);
-  };
+  }, [date, sort]);
 
   return (
     <div className="container-fluid">
@@ -61,7 +58,7 @@ const AdminDashboard = () => {
                   <Select
                     value={date}
                     style={{ width: 120 }}
-                    onChange={handleChangeDate}
+                    onChange={(value) => setDate(value)}
                     className="mx-3"
                     disabled={loading}
                   >
@@ -70,6 +67,29 @@ const AdminDashboard = () => {
                     <Option value="This Month">This Month</Option>
                     <Option value="This Week">This Week</Option>
                     <Option value="Today">Today</Option>
+                  </Select>
+                </span>
+                Sort By
+                <span>
+                  <Select
+                    value={sort}
+                    style={{ width: 240 }}
+                    onChange={(value) => setSort(value)}
+                    className="mx-3"
+                    disabled={loading}
+                  >
+                    <Option value="Total Price - High to Low">
+                      Total Price - High to Low
+                    </Option>
+                    <Option value="Total Price - Low to High">
+                      Total Price - Low to High
+                    </Option>
+                    <Option value="Number Sold - High to Low">
+                      Number Sold - High to Low
+                    </Option>
+                    <Option value="Number Sold - Low to High">
+                      Number Sold - Low to High
+                    </Option>
                   </Select>
                 </span>
               </h5>
@@ -81,14 +101,14 @@ const AdminDashboard = () => {
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                   <Tooltip
                     formatter={(value, name) => {
-                      return name === 'totalPrice'
+                      return name === 'total'
                         ? `$${new Intl.NumberFormat('en').format(value)}`
                         : value;
                     }}
                   />
                   <Legend />
-                  <Bar yAxisId="left" dataKey="quantitySold" fill="#8884d8" />
-                  <Bar yAxisId="right" dataKey="totalPrice" fill="#82ca9d" />
+                  <Bar yAxisId="left" dataKey="sold" fill="#8884d8" />
+                  <Bar yAxisId="right" dataKey="total" fill="#82ca9d" />
                 </BarChart>
               </ResponsiveContainer>
             </TabPane>
@@ -99,7 +119,7 @@ const AdminDashboard = () => {
                   <Select
                     value={date}
                     style={{ width: 120 }}
-                    onChange={handleChangeDate}
+                    onChange={(value) => setDate(value)}
                     className="mx-3"
                     disabled={loading}
                   >
