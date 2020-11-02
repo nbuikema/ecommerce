@@ -40,6 +40,12 @@ exports.currentUser = async (req, res) => {
         throw new Error(error);
       }
 
-      return res.json(user);
+      res.json(user);
     });
+
+  await User.findOneAndUpdate(
+    { email: req.user.email },
+    { lastLogin: Date.now() },
+    { new: true }
+  );
 };

@@ -11,6 +11,17 @@ exports.listOrders = async (_, res) => {
   res.json(orders);
 };
 
+exports.listNewOrders = async (req, res) => {
+  const { lastLogin } = req.body;
+
+  const orders = await Order.find({ createdAt: { $gte: lastLogin } })
+    .sort('-createdAt')
+    .populate('products.product')
+    .exec();
+
+  res.json(orders);
+};
+
 exports.getOrdersByDate = async (req, res) => {
   const { date } = req.body;
 
@@ -66,18 +77,18 @@ exports.getOrdersByDate = async (req, res) => {
 
   if (date === 'This Year') {
     ordersByDate = [
-      { dateGroup: 'January', orders: 0, average: 0 },
-      { dateGroup: 'February', orders: 0, average: 0 },
-      { dateGroup: 'March', orders: 0, average: 0 },
-      { dateGroup: 'April', orders: 0, average: 0 },
-      { dateGroup: 'May', orders: 0, average: 0 },
-      { dateGroup: 'June', orders: 0, average: 0 },
-      { dateGroup: 'July', orders: 0, average: 0 },
-      { dateGroup: 'August', orders: 0, average: 0 },
-      { dateGroup: 'September', orders: 0, average: 0 },
-      { dateGroup: 'October', orders: 0, average: 0 },
-      { dateGroup: 'November', orders: 0, average: 0 },
-      { dateGroup: 'December', orders: 0, average: 0 }
+      { dateGroup: 'January', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'February', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'March', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'April', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'May', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'June', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'July', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'August', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'September', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'October', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'November', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'December', orders: 0, average: 0, sales: 0 }
     ];
   }
 
@@ -86,51 +97,56 @@ exports.getOrdersByDate = async (req, res) => {
       {
         dateGroup: `${orders[0].orderedMonth}/1 - ${orders[0].orderedMonth}/7`,
         orders: 0,
-        average: 0
+        average: 0,
+        sales: 0
       },
       {
         dateGroup: `${orders[0].orderedMonth}/8 - ${orders[0].orderedMonth}/14`,
         orders: 0,
-        average: 0
+        average: 0,
+        sales: 0
       },
       {
         dateGroup: `${orders[0].orderedMonth}/15 - ${orders[0].orderedMonth}/21`,
         orders: 0,
-        average: 0
+        average: 0,
+        sales: 0
       },
       {
         dateGroup: `${orders[0].orderedMonth}/22 - ${orders[0].orderedMonth}/28`,
         orders: 0,
-        average: 0
+        average: 0,
+        sales: 0
       },
       {
         dateGroup: `${orders[0].orderedMonth}/29 - ${orders[0].orderedMonth}/31`,
         orders: 0,
-        average: 0
+        average: 0,
+        sales: 0
       }
     ];
   }
 
   if (date === 'This Week') {
     ordersByDate = [
-      { dateGroup: 'Sunday', orders: 0, average: 0 },
-      { dateGroup: 'Monday', orders: 0, average: 0 },
-      { dateGroup: 'Tuesday', orders: 0, average: 0 },
-      { dateGroup: 'Wednesday', orders: 0, average: 0 },
-      { dateGroup: 'Thursday', orders: 0, average: 0 },
-      { dateGroup: 'Friday', orders: 0, average: 0 },
-      { dateGroup: 'Saturday', orders: 0, average: 0 }
+      { dateGroup: 'Sunday', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'Monday', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'Tuesday', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'Wednesday', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'Thursday', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'Friday', orders: 0, average: 0, sales: 0 },
+      { dateGroup: 'Saturday', orders: 0, average: 0, sales: 0 }
     ];
   }
 
   if (date === 'Today') {
     ordersByDate = [
-      { dateGroup: '12 am - 4 am EST', orders: 0, average: 0 },
-      { dateGroup: '4 am - 8 am EST', orders: 0, average: 0 },
-      { dateGroup: '8 am - 12 pm EST', orders: 0, average: 0 },
-      { dateGroup: '12 pm - 4 pm EST', orders: 0, average: 0 },
-      { dateGroup: '4 pm - 8 pm EST', orders: 0, average: 0 },
-      { dateGroup: '8 pm - 12 am EST', orders: 0, average: 0 }
+      { dateGroup: '12 am - 4 am EST', orders: 0, average: 0, sales: 0 },
+      { dateGroup: '4 am - 8 am EST', orders: 0, average: 0, sales: 0 },
+      { dateGroup: '8 am - 12 pm EST', orders: 0, average: 0, sales: 0 },
+      { dateGroup: '12 pm - 4 pm EST', orders: 0, average: 0, sales: 0 },
+      { dateGroup: '4 pm - 8 pm EST', orders: 0, average: 0, sales: 0 },
+      { dateGroup: '8 pm - 12 am EST', orders: 0, average: 0, sales: 0 }
     ];
   }
 
@@ -146,13 +162,13 @@ exports.getOrdersByDate = async (req, res) => {
 
       if (existsIndex > -1) {
         ordersByDate[existsIndex].orders++;
-        ordersByDate[existsIndex].average += order.paymentIntent.amount / 100;
+        ordersByDate[existsIndex].sales += order.paymentIntent.amount / 100;
       } else {
         dateGroup = order.orderedYear;
         orders = 1;
-        average = order.paymentIntent.amount / 100;
+        sales = order.paymentIntent.amount / 100;
 
-        ordersByDate.push({ dateGroup, orders, average });
+        ordersByDate.push({ dateGroup, orders, sales });
       }
     }
 
@@ -162,7 +178,7 @@ exports.getOrdersByDate = async (req, res) => {
       );
 
       ordersByDate[index].orders++;
-      ordersByDate[index].average += order.paymentIntent.amount / 100;
+      ordersByDate[index].sales += order.paymentIntent.amount / 100;
     }
 
     if (date === 'This Month') {
@@ -189,7 +205,7 @@ exports.getOrdersByDate = async (req, res) => {
       });
 
       ordersByDate[exists].orders++;
-      ordersByDate[exists].average += order.paymentIntent.amount / 100;
+      ordersByDate[exists].sales += order.paymentIntent.amount / 100;
     }
 
     if (date === 'This Week') {
@@ -199,43 +215,42 @@ exports.getOrdersByDate = async (req, res) => {
       );
 
       ordersByDate[exists].orders++;
-      ordersByDate[exists].average += order.paymentIntent.amount / 100;
+      ordersByDate[exists].sales += order.paymentIntent.amount / 100;
     }
 
     if (date === 'Today') {
       if (order.orderedHour - 5 >= 0 && order.orderedHour - 5 <= 3) {
         ordersByDate[0].orders++;
-        ordersByDate[0].average += order.paymentIntent.amount / 100;
+        ordersByDate[0].sales += order.paymentIntent.amount / 100;
       }
       if (order.orderedHour - 5 >= 4 && order.orderedHour - 5 <= 7) {
         ordersByDate[1].orders++;
-        ordersByDate[1].average += order.paymentIntent.amount / 100;
+        ordersByDate[1].sales += order.paymentIntent.amount / 100;
       }
       if (order.orderedHour - 5 >= 8 && order.orderedHour - 5 <= 11) {
         ordersByDate[2].orders++;
-        ordersByDate[2].average += order.paymentIntent.amount / 100;
+        ordersByDate[2].sales += order.paymentIntent.amount / 100;
       }
       if (order.orderedHour - 5 >= 12 && order.orderedHour - 5 <= 15) {
         ordersByDate[3].orders++;
-        ordersByDate[3].average += order.paymentIntent.amount / 100;
+        ordersByDate[3].sales += order.paymentIntent.amount / 100;
       }
       if (order.orderedHour - 5 >= 16 && order.orderedHour - 5 <= 19) {
         ordersByDate[4].orders++;
-        ordersByDate[4].average += order.paymentIntent.amount / 100;
+        ordersByDate[4].sales += order.paymentIntent.amount / 100;
       }
       if (order.orderedHour - 5 >= 20 && order.orderedHour - 5 <= 23) {
         ordersByDate[5].orders++;
-        ordersByDate[5].average += order.paymentIntent.amount / 100;
+        ordersByDate[5].sales += order.paymentIntent.amount / 100;
       }
     }
   });
 
   ordersByDate.forEach((section) => {
-    section.average === 0
-      ? 0
-      : (section.average = parseFloat(
-          (section.average / section.orders).toFixed(2)
-        ));
+    if (section.sales > 0) {
+      section.average = parseFloat((section.sales / section.orders).toFixed(2));
+      section.sales = parseFloat(section.sales.toFixed(2));
+    }
   });
 
   res.json(ordersByDate);

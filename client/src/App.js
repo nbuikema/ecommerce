@@ -50,7 +50,17 @@ const App = () => {
         currentUser(token)
           .then(
             ({
-              data: { _id, email, name, role, cart, address, orders, wishlist }
+              data: {
+                _id,
+                email,
+                name,
+                role,
+                cart,
+                address,
+                orders,
+                wishlist,
+                lastLogin
+              }
             }) => {
               dispatch({
                 type: 'LOGGED_IN_USER',
@@ -62,6 +72,7 @@ const App = () => {
                   address,
                   orders,
                   wishlist,
+                  lastLogin,
                   token
                 }
               });

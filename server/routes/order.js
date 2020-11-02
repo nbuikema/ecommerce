@@ -7,11 +7,13 @@ const { authCheck, adminCheck } = require('../middleware/auth');
 const {
   listOrders,
   updateOrder,
-  getOrdersByDate
+  getOrdersByDate,
+  listNewOrders
 } = require('../controllers/order');
 
 router.get('/all', authCheck, adminCheck, listOrders);
-router.post('/by-date', getOrdersByDate);
+router.post('/by-date', authCheck, adminCheck, getOrdersByDate);
+router.post('/new', authCheck, adminCheck, listNewOrders);
 
 router.put('/update/:orderId', authCheck, adminCheck, updateOrder);
 

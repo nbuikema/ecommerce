@@ -15,7 +15,8 @@ const {
   listAllInCategory,
   listAllInSubcategory,
   searchFilters,
-  getProductsBySoldValue
+  getProductsBySoldValue,
+  getProductsByInventory
 } = require('../controllers/product');
 
 // middleware
@@ -33,7 +34,8 @@ router.get('/related/:productId', listRelated);
 router.get('/by/category/:categorySlug', listAllInCategory);
 router.get('/by/subcategory/:subcategorySlug', listAllInSubcategory);
 router.post('/search/filters', searchFilters);
-router.post('/sold-value', getProductsBySoldValue);
+router.post('/sold-value', authCheck, adminCheck, getProductsBySoldValue);
+router.post('/inventory', authCheck, adminCheck, getProductsByInventory);
 
 // update
 router.put('/update/:slug', authCheck, adminCheck, update);

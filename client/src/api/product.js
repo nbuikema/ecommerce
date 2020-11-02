@@ -60,11 +60,33 @@ export const getProductsWithFilter = async (args) => {
   );
 };
 
-export const getProductsBySoldValue = async (date, sort) => {
-  return await axios.post(`${process.env.REACT_APP_API}/product/sold-value`, {
-    date,
-    sort
-  });
+export const getProductsBySoldValue = async (authtoken, date, sort) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/product/sold-value`,
+    {
+      date,
+      sort
+    },
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
+};
+
+export const getProductsByInventory = async (authtoken, sort) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/product/inventory`,
+    {
+      sort
+    },
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
 };
 
 // update product

@@ -257,7 +257,7 @@ exports.getProductsBySoldValue = async (req, res) => {
 
   orders.forEach((order) => {
     let title = '';
-    let total = 0;
+    let sales = 0;
     let sold = 0;
 
     order.productsList.forEach((product, index) => {
@@ -267,41 +267,52 @@ exports.getProductsBySoldValue = async (req, res) => {
 
       if (existsIndex > -1) {
         productsBySoldValue[existsIndex].sold += order.products[index].quantity;
-        productsBySoldValue[existsIndex].total = parseFloat(
+        productsBySoldValue[existsIndex].sales = parseFloat(
           (
             product.price * order.products[index].quantity +
-            productsBySoldValue[existsIndex].total
+            productsBySoldValue[existsIndex].sales
           ).toFixed(2)
         );
       } else {
         title = product.title;
-        total = parseFloat(
+        sales = parseFloat(
           (product.price * order.products[index].quantity).toFixed(2)
         );
         sold = order.products[index].quantity;
 
-        productsBySoldValue.push({ title, total, sold });
+        productsBySoldValue.push({ title, sales, sold });
       }
     });
   });
 
-  if (sort === 'Total Price - High to Low') {
-    productsBySoldValue.sort((a, b) => b.total - a.total);
+  if (sort === 'Gross Sales - High to Low') {
+    productsBySoldValue.sort((a, b) => b.sales - a.sales);
   }
 
-  if (sort === 'Total Price - Low to High') {
-    productsBySoldValue.sort((a, b) => a.total - b.total);
+  if (sort === 'Gross Sales - Low to High') {
+    productsBySoldValue.sort((a, b) => a.sales - b.sales);
   }
 
-  if (sort === 'Number Sold - High to Low') {
+  if (sort === 'Quantity Sold - High to Low') {
     productsBySoldValue.sort((a, b) => b.sold - a.sold);
   }
 
-  if (sort === 'Number Sold - Low to High') {
+  if (sort === 'Quantity Sold - Low to High') {
     productsBySoldValue.sort((a, b) => a.sold - b.sold);
   }
 
   res.json(productsBySoldValue);
+};
+
+exports.getProductsByInventory = async (req, res) => {
+  const { sort } = req.body;
+
+  const products = await Product.find()
+    .sort([['quantity', sort]])
+    .select('-_id title quantity')
+    .exec();
+
+  res.json(products);
 };
 
 // update
