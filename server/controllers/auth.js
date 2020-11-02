@@ -46,6 +46,6 @@ exports.currentUser = async (req, res) => {
   await User.findOneAndUpdate(
     { email: req.user.email },
     { lastLogin: Date.now() },
-    { new: true }
+    { new: true, timestamps: false }
   );
 };
