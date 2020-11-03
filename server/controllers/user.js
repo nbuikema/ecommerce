@@ -12,9 +12,7 @@ exports.updateCart = async (req, res) => {
 
       if (existsIndex === -1) {
         cart.push(cartItem);
-      }
-
-      if (existsIndex > -1 && cartItem.quantity === 0) {
+      } else if (existsIndex > -1 && cartItem.quantity === 0) {
         cart.splice(existsIndex, 1);
       }
 

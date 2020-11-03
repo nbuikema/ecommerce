@@ -68,8 +68,7 @@ exports.listWithQuery = async (req, res) => {
     if (sort && sort === 'averageRating') {
       const products = await Product.aggregate([
         {
-          $project: {
-            document: '$$ROOT',
+          $addFields: {
             averageRating: { $avg: '$ratings.rating' }
           }
         },

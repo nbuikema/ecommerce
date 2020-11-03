@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 
 import ProductCard from '../../components/cards/ProductCard';
 import LoadingCard from '../../components/cards/LoadingCard';
+import LoadingForm from '../../components/forms/LoadingForm';
 
 import { Pagination } from 'antd';
 
@@ -15,34 +16,24 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
 
   useEffect(() => {
     setLoading(true);
+
     getProductsCount()
       .then((res) => {
         setProductsCount(res.data);
         getProductsWithQuery(sort, order, limit, page)
           .then((res) => {
-            if (res.data[0].averageRating) {
-              let productsArray = [];
-
-              for (let i = 0; i < res.data.length; i++) {
-                productsArray.push({
-                  ...res.data[i].document,
-                  averageRating: res.data[i].averageRating
-                });
-              }
-              setProducts(productsArray);
-              setLoading(false);
-            } else {
-              setProducts(res.data);
-              setLoading(false);
-            }
+            setProducts(res.data);
+            setLoading(false);
           })
           .catch((error) => {
-            toast.error(error);
+            toast.error(error.message);
+
             setLoading(false);
           });
       })
       .catch((error) => {
-        toast.error(error);
+        toast.error(error.message);
+
         setLoading(false);
       });
   }, [sort, order, limit, page]);
@@ -76,14 +67,20 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
         </div>
       </div>
       <div className="row">
-        <nav className="col-md-4 offset-md-4 text-center pt-5 p-3">
-          <Pagination
-            current={page}
-            total={(productsCount / limit) * 10}
-            onChange={(value) => setPage(value)}
-            className="text-center"
-          />
-        </nav>
+        {loading ? (
+          <div className="col-md-4 offset-md-4 text-center pt-5 p-3">
+            <LoadingForm />
+          </div>
+        ) : (
+          <nav className="col-md-4 offset-md-4 text-center pt-5 p-3">
+            <Pagination
+              current={page}
+              total={(productsCount / limit) * 10}
+              onChange={(value) => setPage(value)}
+              className="text-center"
+            />
+          </nav>
+        )}
       </div>
     </div>
   );

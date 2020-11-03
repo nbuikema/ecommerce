@@ -67,7 +67,9 @@ const ProductCard = ({
     });
   };
 
-  const handleRemove = (product) => {
+  const handleRemove = (e, product) => {
+    e.stopPropagation();
+
     user &&
       updateCart(cart, { product, quantity: 0 }, user.token)
         .then(() => {})
@@ -84,8 +86,7 @@ const ProductCard = ({
   const handleQuantityChange = (quantityValue, product) => {
     const value = parseInt(quantityValue);
 
-    let numProduct;
-    numProduct =
+    const numProduct =
       value > 0 ? (value < product.quantity ? value : product.quantity) : 1;
 
     if (numProduct > 0) {
@@ -93,7 +94,7 @@ const ProductCard = ({
         updateCart(cart, { product, quantity: numProduct }, user.token)
           .then(() => {})
           .catch((error) => {
-            console.log(error);
+            toast.error(error.message);
           });
 
       dispatch({
@@ -194,16 +195,19 @@ const ProductCard = ({
     if (showCart) {
       return [
         <div>
-          <InputNumber
-            min={1}
-            max={product.quantity}
-            value={quantity}
-            onChange={(value) => handleQuantityChange(value, product)}
-          />
-          <br />
-          Quantity
+          <span onClick={(e) => e.stopPropagation()}>
+            <InputNumber
+              min={1}
+              max={product.quantity}
+              value={quantity}
+              onChange={(value) => handleQuantityChange(value, product)}
+              onClick={(e) => e.preventDefault()}
+            />
+            <br />
+            Quantity
+          </span>
         </div>,
-        <div onClick={() => handleRemove(product)}>
+        <div onClick={(e) => handleRemove(e, product)}>
           <CloseOutlined
             className="text-danger mt-2"
             style={{ fontSize: '20px' }}
