@@ -15,7 +15,7 @@ const {
   listAllInCategory,
   listAllInSubcategory,
   searchFilters,
-  getProductsBySoldValue,
+  getProductsByDate,
   getProductsByInventory
 } = require('../controllers/product');
 
@@ -23,25 +23,30 @@ const {
 const { authCheck, adminCheck } = require('../middleware/auth');
 
 // create
-router.post('/create', authCheck, adminCheck, create);
+router.post('/product', authCheck, adminCheck, create);
 
 // read
-router.get('/read/:slug', read);
-router.get('/all/:count', list);
-router.get('/count', listCount);
-router.post('/query', listWithQuery);
-router.get('/related/:productId', listRelated);
-router.get('/by/category/:categorySlug', listAllInCategory);
-router.get('/by/subcategory/:subcategorySlug', listAllInSubcategory);
-router.post('/search/filters', searchFilters);
-router.post('/sold-value', authCheck, adminCheck, getProductsBySoldValue);
-router.post('/inventory', authCheck, adminCheck, getProductsByInventory);
+router.get('/product/:slug', read);
+router.get('/products/count', listCount);
+router.post('/products/query', listWithQuery);
+router.get('/products/related/:productId', listRelated);
+router.get('/products/category/:categorySlug', listAllInCategory);
+router.get('/products/subcategory/:subcategorySlug', listAllInSubcategory);
+router.post('/products/search/filters', searchFilters);
+router.post('/products/sold', authCheck, adminCheck, getProductsByDate);
+router.post(
+  '/products/inventory',
+  authCheck,
+  adminCheck,
+  getProductsByInventory
+);
+router.get('/products/:count', list);
 
 // update
-router.put('/update/:slug', authCheck, adminCheck, update);
-router.put('/rate/:productId', authCheck, rateProduct);
+router.put('/product/:slug', authCheck, adminCheck, update);
+router.put('/product/rate/:productId', authCheck, rateProduct);
 
 // delete
-router.delete('/delete/:slug', authCheck, adminCheck, remove);
+router.delete('/product/:slug', authCheck, adminCheck, remove);
 
 module.exports = router;

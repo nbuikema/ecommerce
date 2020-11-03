@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const getAllOrders = async (authtoken) => {
-  return await axios.get(`${process.env.REACT_APP_API}/order/all`, {
+  return await axios.get(`${process.env.REACT_APP_API}/orders`, {
     headers: {
       authtoken
     }
@@ -10,7 +10,7 @@ export const getAllOrders = async (authtoken) => {
 
 export const getOrdersByDate = async (authtoken, date) => {
   return await axios.post(
-    `${process.env.REACT_APP_API}/order/by-date`,
+    `${process.env.REACT_APP_API}/orders/date`,
     {
       date
     },
@@ -24,7 +24,7 @@ export const getOrdersByDate = async (authtoken, date) => {
 
 export const getNewOrders = async (authtoken, lastLogin) => {
   return await axios.post(
-    `${process.env.REACT_APP_API}/order/new`,
+    `${process.env.REACT_APP_API}/orders/new`,
     {
       lastLogin
     },
@@ -38,8 +38,20 @@ export const getNewOrders = async (authtoken, lastLogin) => {
 
 export const updateOrder = async (authtoken, orderId, orderStatus) => {
   return await axios.put(
-    `${process.env.REACT_APP_API}/order/update/${orderId}`,
+    `${process.env.REACT_APP_API}/order/${orderId}`,
     { orderStatus },
+    {
+      headers: {
+        authtoken
+      }
+    }
+  );
+};
+
+export const createOrder = async (authtoken, cart, address, paymentIntent) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/order`,
+    { address, cart, paymentIntent },
     {
       headers: {
         authtoken

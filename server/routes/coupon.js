@@ -8,16 +8,16 @@ const { create, read, update, remove, list } = require('../controllers/coupon');
 const { authCheck, adminCheck } = require('../middleware/auth');
 
 // create
-router.post('/create', authCheck, adminCheck, create);
+router.post('/coupon', authCheck, adminCheck, create);
 
 // read
-router.get('/read/:couponName', read);
-router.get('/all', list);
+router.get('/coupon/:couponName', read);
+router.get('/coupons', list);
 
 // update
-router.put('/update/:couponName', authCheck, adminCheck, update);
+router.put('/coupon/:couponName', authCheck, adminCheck, update);
 
 // delete
-router.delete('/delete/:couponId', authCheck, adminCheck, remove);
+router.delete('/coupon/:couponId', authCheck, adminCheck, remove);
 
 module.exports = router;

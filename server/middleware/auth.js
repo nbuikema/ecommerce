@@ -1,6 +1,7 @@
 const admin = require('../firebase');
 const User = require('../models/user');
 
+// check if user is authenticated with firebase
 exports.authCheck = async (req, res, next) => {
   try {
     req.user = await admin.auth().verifyIdToken(req.headers.authtoken);
@@ -15,6 +16,7 @@ exports.authCheck = async (req, res, next) => {
   }
 };
 
+// check authenticated users role
 exports.adminCheck = async (req, res, next) => {
   try {
     const { email } = req.user;

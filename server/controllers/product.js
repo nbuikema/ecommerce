@@ -4,7 +4,7 @@ const Category = require('../models/category');
 const Subcategory = require('../models/subcategory');
 const Order = require('../models/order');
 const slugify = require('slugify');
-const moment = require('moment');
+const { setQuery, setProductsByDate } = require('../helpers/product');
 
 // create
 exports.create = async (req, res) => {
@@ -21,29 +21,41 @@ exports.create = async (req, res) => {
 
 // read
 exports.read = async (req, res) => {
-  const product = await Product.findOne({ slug: req.params.slug })
-    .populate('category')
-    .populate('subcategories')
-    .exec();
+  try {
+    const product = await Product.findOne({ slug: req.params.slug })
+      .populate('category')
+      .populate('subcategories')
+      .exec();
 
-  res.json(product);
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.list = async (req, res) => {
-  const products = await Product.find()
-    .limit(parseInt(req.params.count))
-    .populate('category')
-    .populate('subcategories')
-    .sort([['createdAt', 'desc']])
-    .exec();
+  try {
+    const products = await Product.find()
+      .limit(parseInt(req.params.count))
+      .populate('category')
+      .populate('subcategories')
+      .sort([['createdAt', 'desc']])
+      .exec();
 
-  res.json(products);
+    res.json(products);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.listCount = async (_, res) => {
-  const totalProducts = await Product.find().estimatedDocumentCount().exec();
+  try {
+    const totalProducts = await Product.find().estimatedDocumentCount().exec();
 
-  res.json(totalProducts);
+    res.json(totalProducts);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.listWithQuery = async (req, res) => {
@@ -84,49 +96,61 @@ exports.listWithQuery = async (req, res) => {
 };
 
 exports.listRelated = async (req, res) => {
-  const product = await Product.findById(req.params.productId).exec();
+  try {
+    const product = await Product.findById(req.params.productId).exec();
 
-  const related = await Product.find({
-    _id: { $ne: product._id },
-    category: product.category
-  })
-    .limit(3)
-    .populate('category')
-    .populate('subcategories')
-    .sort([['createdAt', 'desc']])
-    .exec();
+    const related = await Product.find({
+      _id: { $ne: product._id },
+      category: product.category
+    })
+      .limit(3)
+      .populate('category')
+      .populate('subcategories')
+      .sort([['createdAt', 'desc']])
+      .exec();
 
-  res.json(related);
+    res.json(related);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.listAllInCategory = async (req, res) => {
-  const category = await Category.findOne({
-    slug: req.params.categorySlug
-  }).exec();
+  try {
+    const category = await Category.findOne({
+      slug: req.params.categorySlug
+    }).exec();
 
-  const products = await Product.find({
-    category
-  })
-    .populate('category')
-    .populate('subcategories')
-    .exec();
+    const products = await Product.find({
+      category
+    })
+      .populate('category')
+      .populate('subcategories')
+      .exec();
 
-  res.json({ products, category });
+    res.json({ products, category });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.listAllInSubcategory = async (req, res) => {
-  const subcategory = await Subcategory.findOne({
-    slug: req.params.subcategorySlug
-  }).exec();
+  try {
+    const subcategory = await Subcategory.findOne({
+      slug: req.params.subcategorySlug
+    }).exec();
 
-  const products = await Product.find({
-    subcategories: subcategory
-  })
-    .populate('category')
-    .populate('subcategories')
-    .exec();
+    const products = await Product.find({
+      subcategories: subcategory
+    })
+      .populate('category')
+      .populate('subcategories')
+      .exec();
 
-  res.json({ products, subcategory });
+    res.json({ products, subcategory });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 const handleQuery = async (req, res) => {
@@ -137,21 +161,13 @@ const handleQuery = async (req, res) => {
     for (let [key, value] of Object.entries(req.body)) {
       if (key === 'query' && value.length > 0) {
         filteredSearch.push({ $text: { $search: value } });
-      }
-
-      if (key === 'price' && value[0] >= 0 && value[1] > 0) {
+      } else if (key === 'price' && value[0] >= 0 && value[1] > 0) {
         filteredSearch.push({ price: { $gte: value[0], $lte: value[1] } });
-      }
-
-      if (key === 'categories' && value.length > 0) {
+      } else if (key === 'categories' && value.length > 0) {
         filteredSearch.push({ category: value });
-      }
-
-      if (key === 'subcategories' && value.length > 0) {
+      } else if (key === 'subcategories' && value.length > 0) {
         filteredSearch.push({ subcategories: { $in: value } });
-      }
-
-      if (key === 'rating' && value) {
+      } else if (key === 'rating' && value) {
         await Product.aggregate([
           {
             $project: {
@@ -171,9 +187,7 @@ const handleQuery = async (req, res) => {
           });
 
         filteredSearch.push({ _id: foundProducts });
-      }
-
-      if (key === 'shipping' && value !== null) {
+      } else if (key === 'shipping' && value !== null) {
         filteredSearch.push({ shipping: value });
       }
     }
@@ -188,7 +202,6 @@ const handleQuery = async (req, res) => {
 
     res.json(products);
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -201,118 +214,54 @@ exports.searchFilters = async (req, res) => {
   }
 };
 
-exports.getProductsBySoldValue = async (req, res) => {
-  const { date, sort } = req.body;
+exports.getProductsByDate = async (req, res) => {
+  try {
+    const { date, sort } = req.body;
 
-  let query;
+    const query = setQuery(date);
 
-  if (date === 'Overall') {
-    query = { orderedYear: { $gte: 0 } };
+    const orders = await Order.aggregate([
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products.product',
+          foreignField: '_id',
+          as: 'productsList'
+        }
+      },
+      {
+        $addFields: {
+          orderedMonth: { $month: '$createdAt' },
+          orderedDayOfMonth: { $dayOfMonth: '$createdAt' },
+          orderedYear: { $year: '$createdAt' },
+          orderedWeek: { $week: '$createdAt' },
+          orderedDayOfWeek: { $dayOfWeek: '$createdAt' }
+        }
+      },
+      { $match: query }
+    ]);
+
+    const productsByDate = setProductsByDate(sort, orders);
+
+    res.json(productsByDate);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-  if (date === 'This Year') {
-    query = { orderedYear: { $eq: new Date().getFullYear() } };
-  }
-  if (date === 'This Month') {
-    query = {
-      orderedMonth: { $eq: new Date().getMonth() + 1 },
-      orderedYear: { $eq: new Date().getFullYear() }
-    };
-  }
-  if (date === 'This Week') {
-    query = {
-      orderedWeek: { $eq: moment(new Date()).week() - 1 },
-      orderedYear: { $eq: new Date().getFullYear() }
-    };
-  }
-  if (date === 'Today') {
-    query = {
-      orderedYear: { $eq: new Date().getFullYear() },
-      orderedMonth: { $eq: new Date().getMonth() + 1 },
-      orderedDayOfMonth: { $eq: new Date().getDate() }
-    };
-  }
-
-  const orders = await Order.aggregate([
-    {
-      $lookup: {
-        from: 'products',
-        localField: 'products.product',
-        foreignField: '_id',
-        as: 'productsList'
-      }
-    },
-    {
-      $addFields: {
-        orderedMonth: { $month: '$createdAt' },
-        orderedDayOfMonth: { $dayOfMonth: '$createdAt' },
-        orderedYear: { $year: '$createdAt' },
-        orderedWeek: { $week: '$createdAt' },
-        orderedDayOfWeek: { $dayOfWeek: '$createdAt' }
-      }
-    },
-    { $match: query }
-  ]);
-
-  let productsBySoldValue = [];
-
-  orders.forEach((order) => {
-    let title = '';
-    let sales = 0;
-    let sold = 0;
-
-    order.productsList.forEach((product, index) => {
-      const existsIndex = productsBySoldValue.findIndex(
-        (x) => x.title === product.title
-      );
-
-      if (existsIndex > -1) {
-        productsBySoldValue[existsIndex].sold += order.products[index].quantity;
-        productsBySoldValue[existsIndex].sales = parseFloat(
-          (
-            product.price * order.products[index].quantity +
-            productsBySoldValue[existsIndex].sales
-          ).toFixed(2)
-        );
-      } else {
-        title = product.title;
-        sales = parseFloat(
-          (product.price * order.products[index].quantity).toFixed(2)
-        );
-        sold = order.products[index].quantity;
-
-        productsBySoldValue.push({ title, sales, sold });
-      }
-    });
-  });
-
-  if (sort === 'Gross Sales - High to Low') {
-    productsBySoldValue.sort((a, b) => b.sales - a.sales);
-  }
-
-  if (sort === 'Gross Sales - Low to High') {
-    productsBySoldValue.sort((a, b) => a.sales - b.sales);
-  }
-
-  if (sort === 'Quantity Sold - High to Low') {
-    productsBySoldValue.sort((a, b) => b.sold - a.sold);
-  }
-
-  if (sort === 'Quantity Sold - Low to High') {
-    productsBySoldValue.sort((a, b) => a.sold - b.sold);
-  }
-
-  res.json(productsBySoldValue);
 };
 
 exports.getProductsByInventory = async (req, res) => {
-  const { sort } = req.body;
+  try {
+    const { sort } = req.body;
 
-  const products = await Product.find()
-    .sort([['quantity', sort]])
-    .select('-_id title quantity')
-    .exec();
+    const products = await Product.find()
+      .sort([['quantity', sort]])
+      .select('-_id title quantity')
+      .exec();
 
-  res.json(products);
+    res.json(products);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 // update
@@ -332,7 +281,7 @@ exports.update = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(400).send('Could not update category.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -376,7 +325,7 @@ exports.rateProduct = async (req, res) => {
       res.json(newRating);
     }
   } catch (error) {
-    res.status(400).send('Could not leave rating for this product.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -389,6 +338,6 @@ exports.remove = async (req, res) => {
 
     res.json(deleted);
   } catch (error) {
-    res.status(400).send('Could not delete product.');
+    res.status(400).json({ error: error.message });
   }
 };

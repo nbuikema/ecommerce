@@ -3,9 +3,9 @@ const slugify = require('slugify');
 
 // create
 exports.create = async (req, res) => {
-  const { name, parentCategory } = req.body;
-
   try {
+    const { name, parentCategory } = req.body;
+
     const subcategory = await new Subcategory({
       name,
       slug: slugify(name).toLowerCase(),
@@ -14,30 +14,40 @@ exports.create = async (req, res) => {
 
     res.json(subcategory);
   } catch (error) {
-    res.status(400).send('Could not create subcategory.');
+    res.status(400).json({ error: error.message });
   }
 };
 
 // read
 exports.read = async (req, res) => {
-  const subcategory = await Subcategory.findOne({
-    slug: req.params.slug
-  }).exec();
+  try {
+    const subcategory = await Subcategory.findOne({
+      slug: req.params.slug
+    }).exec();
 
-  res.json(subcategory);
+    res.json(subcategory);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.list = async (_, res) => {
-  const subcategories = await Subcategory.find().sort({ createdAt: -1 }).exec();
+  try {
+    const subcategories = await Subcategory.find()
+      .sort({ createdAt: -1 })
+      .exec();
 
-  res.json(subcategories);
+    res.json(subcategories);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 // update
 exports.update = async (req, res) => {
-  const { name, parentCategory } = req.body;
-
   try {
+    const { name, parentCategory } = req.body;
+
     const updated = await Subcategory.findOneAndUpdate(
       {
         slug: req.params.slug
@@ -52,7 +62,7 @@ exports.update = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(400).send('Could not update subcategory.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -65,6 +75,6 @@ exports.remove = async (req, res) => {
 
     res.json(deleted);
   } catch (error) {
-    res.status(400).send('Could not delete subcategory.');
+    res.status(400).json({ error: error.message });
   }
 };

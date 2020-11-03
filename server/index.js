@@ -25,9 +25,8 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 
 // dynamically import and read routes from fs
-fs.readdirSync('./routes').map((r) => {
-  let route = r.split('.')[0];
-  app.use('/api/' + route, require('./routes/' + route));
+fs.readdirSync('./routes').map((route) => {
+  app.use('/api', require('./routes/' + route));
 });
 
 // start server

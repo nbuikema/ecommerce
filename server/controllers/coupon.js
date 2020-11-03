@@ -7,21 +7,29 @@ exports.create = async (req, res) => {
 
     res.json(coupon);
   } catch (error) {
-    res.status(400).send('Could not create coupon.');
+    res.status(400).json({ error: error.message });
   }
 };
 
 // read
 exports.read = async (req, res) => {
-  const coupon = await Coupon.findOne({ name: req.params.couponName }).exec();
+  try {
+    const coupon = await Coupon.findOne({ name: req.params.couponName }).exec();
 
-  res.json(coupon);
+    res.json(coupon);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.list = async (_, res) => {
-  const coupons = await Coupon.find().exec();
+  try {
+    const coupons = await Coupon.find().exec();
 
-  res.json(coupons);
+    res.json(coupons);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 // update
@@ -35,7 +43,7 @@ exports.update = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(400).send('Could not update coupon.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -46,6 +54,6 @@ exports.remove = async (req, res) => {
 
     res.json(deleted);
   } catch (error) {
-    res.status(400).send('Could not delete coupon.');
+    res.status(400).json({ error: error.message });
   }
 };

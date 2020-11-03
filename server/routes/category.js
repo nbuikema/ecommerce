@@ -15,17 +15,17 @@ const {
 const { authCheck, adminCheck } = require('../middleware/auth');
 
 // create
-router.post('/create', authCheck, adminCheck, create);
+router.post('/category', authCheck, adminCheck, create);
 
 // read
-router.get('/read/:slug', read);
-router.get('/all', list);
-router.get('/:_id/subcategories', getCategorySubcategories);
+router.get('/category/:slug', read);
+router.get('/categories', list);
+router.get('/category/:_id/subcategories', getCategorySubcategories);
 
 // update
-router.put('/update/:slug', authCheck, adminCheck, update);
+router.put('/category/:slug', authCheck, adminCheck, update);
 
 // delete
-router.delete('/delete/:slug', authCheck, adminCheck, remove);
+router.delete('/category/:slug', authCheck, adminCheck, remove);
 
 module.exports = router;

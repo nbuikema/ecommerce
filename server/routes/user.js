@@ -1,25 +1,25 @@
 const express = require('express');
 const router = express.Router();
 
+// middleware
 const { authCheck } = require('../middleware/auth');
 
 // import controllers
 const {
   updateCart,
   updateAddress,
-  createOrder,
   addToWishlist,
   readWishlist,
   removeFromWishlist
 } = require('../controllers/user');
 
-router.post('/create-order', authCheck, createOrder);
+// update user cart / address
+router.put('/user/cart', authCheck, updateCart);
+router.put('/user/address', authCheck, updateAddress);
 
-router.put('/update-cart', authCheck, updateCart);
-router.put('/update-address', authCheck, updateAddress);
-
-router.post('/wishlist', authCheck, addToWishlist);
-router.get('/wishlist', authCheck, readWishlist);
-router.put('/wishlist/:productId', authCheck, removeFromWishlist);
+// add, read, remove user wishlist
+router.post('/user/wishlist', authCheck, addToWishlist);
+router.get('/user/wishlist', authCheck, readWishlist);
+router.put('/user/wishlist/:productId', authCheck, removeFromWishlist);
 
 module.exports = router;

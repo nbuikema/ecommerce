@@ -1,6 +1,4 @@
 const User = require('../models/user');
-const Product = require('../models/product');
-const Order = require('../models/order');
 const mongoose = require('mongoose');
 
 exports.updateCart = async (req, res) => {
@@ -37,7 +35,7 @@ exports.updateCart = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(400).send('Could not update cart.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -55,57 +53,7 @@ exports.updateAddress = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(400).send('Could not update address.');
-  }
-};
-
-exports.createOrder = async (req, res) => {
-  try {
-    const { cart, address, paymentIntent } = req.body;
-
-    const foundUser = await User.findOne({ email: req.user.email }).exec();
-
-    const { _id } = await new Order({
-      products: cart,
-      paymentIntent: paymentIntent.paymentIntent,
-      orderedBy: foundUser._id,
-      address
-    }).save();
-
-    const updatedUser = await User.findOneAndUpdate(
-      {
-        email: req.user.email
-      },
-      { $push: { orders: { _id } }, $set: { cart: [] } },
-      { new: true }
-    )
-      .populate({
-        path: 'orders',
-        populate: {
-          path: 'products.product'
-        }
-      })
-      .select('-cart -__v -createdAt -updatedAt')
-      .exec();
-
-    const bulkOption = cart.map((item) => {
-      return {
-        updateOne: {
-          filter: { _id: item.product._id },
-          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
-        }
-      };
-    });
-
-    await Product.bulkWrite(bulkOption, {
-      new: true,
-      timestamps: false
-    });
-
-    res.json(updatedUser);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send('Could not create order.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -130,37 +78,44 @@ exports.addToWishlist = async (req, res) => {
 
     res.json(updatedUser);
   } catch (error) {
-    console.log(error);
-    res.status(400).send('Could not add to wishlist.');
+    res.status(400).json({ error: error.message });
   }
 };
 
 exports.readWishlist = async (req, res) => {
-  const wishlist = await (await User.findOne({ email: req.user.email }))
-    .isSelected('wishlist')
-    .populate('wishlist')
-    .exec();
+  try {
+    const wishlist = await (await User.findOne({ email: req.user.email }))
+      .isSelected('wishlist')
+      .populate('wishlist')
+      .exec();
 
-  res.json(wishlist);
+    res.json(wishlist);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.removeFromWishlist = async (req, res) => {
-  const { productId } = req.params;
+  try {
+    const { productId } = req.params;
 
-  const updatedUser = await User.findOneAndUpdate(
-    { email: req.user.email },
-    { $pull: { wishlist: productId } },
-    { new: true }
-  )
-    .populate({
-      path: 'orders',
-      populate: {
-        path: 'products.product'
-      }
-    })
-    .populate('wishlist')
-    .select('-cart -__v -createdAt -updatedAt')
-    .exec();
+    const updatedUser = await User.findOneAndUpdate(
+      { email: req.user.email },
+      { $pull: { wishlist: productId } },
+      { new: true }
+    )
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'products.product'
+        }
+      })
+      .populate('wishlist')
+      .select('-cart -__v -createdAt -updatedAt')
+      .exec();
 
-  res.json(updatedUser);
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };

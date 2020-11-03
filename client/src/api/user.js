@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const updateCart = async (cart, cartItem, authtoken) => {
   return await axios.put(
-    `${process.env.REACT_APP_API}/user/update-cart`,
+    `${process.env.REACT_APP_API}/user/cart`,
     { cart, cartItem },
     {
       headers: {
@@ -14,20 +14,8 @@ export const updateCart = async (cart, cartItem, authtoken) => {
 
 export const updateAddress = async (address, authtoken) => {
   return await axios.put(
-    `${process.env.REACT_APP_API}/user/update-address`,
+    `${process.env.REACT_APP_API}/user/address`,
     { address },
-    {
-      headers: {
-        authtoken
-      }
-    }
-  );
-};
-
-export const createOrder = async (authtoken, cart, address, paymentIntent) => {
-  return await axios.post(
-    `${process.env.REACT_APP_API}/user/create-order`,
-    { address, cart, paymentIntent },
     {
       headers: {
         authtoken

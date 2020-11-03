@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+// middleware
 const { authCheck, adminCheck } = require('../middleware/auth');
 
 // import controllers
@@ -8,13 +9,19 @@ const {
   listOrders,
   updateOrder,
   getOrdersByDate,
-  listNewOrders
+  listNewOrders,
+  createOrder
 } = require('../controllers/order');
 
-router.get('/all', authCheck, adminCheck, listOrders);
-router.post('/by-date', authCheck, adminCheck, getOrdersByDate);
-router.post('/new', authCheck, adminCheck, listNewOrders);
+// create
+router.post('/order', authCheck, createOrder);
 
-router.put('/update/:orderId', authCheck, adminCheck, updateOrder);
+// read
+router.get('/orders', authCheck, adminCheck, listOrders);
+router.post('/orders/date', authCheck, adminCheck, getOrdersByDate);
+router.post('/orders/new', authCheck, adminCheck, listNewOrders);
+
+// update
+router.put('/order/:orderId', authCheck, adminCheck, updateOrder);
 
 module.exports = router;

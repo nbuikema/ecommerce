@@ -7,21 +7,25 @@ cloudinary.config({
 });
 
 exports.upload = async (req, res) => {
-  const result = await cloudinary.uploader.upload(req.body.image, {
-    public_id: `${Date.now()}`,
-    resource_type: 'auto'
-  });
+  try {
+    const result = await cloudinary.uploader.upload(req.body.image, {
+      public_id: `${Date.now()}`,
+      resource_type: 'auto'
+    });
 
-  res.json({
-    public_id: result.public_id,
-    url: result.secure_url
-  });
+    res.json({
+      public_id: result.public_id,
+      url: result.secure_url
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.remove = (req, res) => {
   cloudinary.uploader.destroy(req.body.public_id, (result, error) => {
     if (error || result.result !== 'ok') {
-      return res.status(400).json('There was an issue removing this image.');
+      return res.status(400).json({ error: error.message });
     }
 
     res.json({ result });

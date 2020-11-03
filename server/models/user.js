@@ -19,6 +19,16 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: []
     },
+    /*cart: [
+      {
+        _id: false,
+        product: {
+          type: ObjectId,
+          ref: 'Product'
+        },
+        quantity: Number
+      }
+    ],*/
     address: {
       type: Array,
       default: []

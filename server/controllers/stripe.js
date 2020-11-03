@@ -2,7 +2,9 @@ const User = require('../models/user');
 const Product = require('../models/product');
 const Coupon = require('../models/coupon');
 const stripe = require('stripe')(process.env.STRIPE_SECRET);
+const { calcCartTotal } = require('../helpers/stripe');
 
+// create payment intent
 exports.createPaymentIntent = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.user.email })
@@ -12,35 +14,17 @@ exports.createPaymentIntent = async (req, res) => {
 
     let totalToCharge = 0;
 
-    const totalFromClient = parseFloat(
-      req.body.cart
-        .reduce((acc, item) => {
-          return acc + item.quantity * item.product.price;
-        }, 0)
-        .toFixed(2)
-    );
+    const totalFromClient = calcCartTotal(req.body.cart);
 
-    const totalFromServer = parseFloat(
-      user.cart
-        .reduce((acc, item) => {
-          return acc + item.quantity * item.product.price;
-        }, 0)
-        .toFixed(2)
-    );
+    const totalFromServer = calcCartTotal(user.cart);
 
     if (totalFromClient === totalFromServer) {
-      if (
-        req.body.coupon &&
-        req.body.coupon.length > 0 &&
-        req.body.discount &&
-        req.body.discount > 0
-      ) {
-        const coupon = await Coupon.findOne({ name: req.body.coupon });
+      const { coupon, discount } = req.body;
 
-        if (
-          coupon.name === req.body.coupon &&
-          coupon.discount === req.body.discount
-        ) {
+      if (coupon && coupon.length > 0 && discount && discount > 0) {
+        const coupon = await Coupon.findOne({ name: coupon });
+
+        if (coupon.name === coupon && coupon.discount === discount) {
           totalToCharge = Math.round(
             totalFromServer * (coupon.discount / 100) * 100
           );
@@ -63,6 +47,6 @@ exports.createPaymentIntent = async (req, res) => {
       clientSecret: paymentIntent.client_secret
     });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ error: error.message });
   }
 };

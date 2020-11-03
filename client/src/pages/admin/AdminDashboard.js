@@ -12,10 +12,7 @@ import {
   Area,
   ResponsiveContainer
 } from 'recharts';
-import {
-  getProductsBySoldValue,
-  getProductsByInventory
-} from '../../api/product';
+import { getProductsByDate, getProductsByInventory } from '../../api/product';
 import { getOrdersByDate, getNewOrders, updateOrder } from '../../api/order';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -70,7 +67,7 @@ const AdminDashboard = () => {
       });
 
     tab === 'Products Sold' &&
-      getProductsBySoldValue(token, date, sort).then((res) => {
+      getProductsByDate(token, date, sort).then((res) => {
         setProducts(res.data);
         setLoading(false);
       });

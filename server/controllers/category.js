@@ -4,9 +4,9 @@ const slugify = require('slugify');
 
 // create
 exports.create = async (req, res) => {
-  const { name } = req.body;
-
   try {
+    const { name } = req.body;
+
     const category = await new Category({
       name,
       slug: slugify(name).toLowerCase()
@@ -14,36 +14,47 @@ exports.create = async (req, res) => {
 
     res.json(category);
   } catch (error) {
-    res.status(400).send('Could not create category.');
+    res.status(400).json({ error: error.message });
   }
 };
 
 // read
 exports.read = async (req, res) => {
-  const category = await Category.findOne({ slug: req.params.slug }).exec();
+  try {
+    const category = await Category.findOne({ slug: req.params.slug }).exec();
 
-  res.json(category);
+    res.json(category);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.list = async (_, res) => {
-  const categories = await Category.find().sort({ createdAt: -1 }).exec();
+  try {
+    const categories = await Category.find().sort({ createdAt: -1 }).exec();
 
-  res.json(categories);
+    res.json(categories);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 exports.getCategorySubcategories = async (req, res) => {
-  const subcategories = await Subcategory.find({
-    parentCategory: req.params._id
-  }).exec();
+  try {
+    const subcategories = await Subcategory.find({
+      parentCategory: req.params._id
+    }).exec();
 
-  res.json(subcategories);
+    res.json(subcategories);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 // update
 exports.update = async (req, res) => {
-  const { name } = req.body;
-
   try {
+    const { name } = req.body;
     const updated = await Category.findOneAndUpdate(
       {
         slug: req.params.slug
@@ -57,7 +68,7 @@ exports.update = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(400).send('Could not update category.');
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -70,6 +81,6 @@ exports.remove = async (req, res) => {
 
     res.json(deleted);
   } catch (error) {
-    res.status(400).send('Could not delete category.');
+    res.status(400).json({ error: error.message });
   }
 };

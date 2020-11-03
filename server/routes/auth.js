@@ -8,10 +8,10 @@ const { createOrUpdateUser, currentUser } = require('../controllers/auth');
 const { authCheck, adminCheck } = require('../middleware/auth');
 
 // create
-router.post('/create-or-update-user', authCheck, createOrUpdateUser);
+router.post('/auth/create-or-update-user', authCheck, createOrUpdateUser);
 
 // read
-router.get('/current-user', authCheck, currentUser);
-router.get('/current-admin', authCheck, adminCheck, currentUser);
+router.get('/auth/current-user', authCheck, currentUser);
+router.get('/auth/current-admin', authCheck, adminCheck, currentUser);
 
 module.exports = router;
