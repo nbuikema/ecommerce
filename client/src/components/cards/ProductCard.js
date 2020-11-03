@@ -49,13 +49,6 @@ const ProductCard = ({
   const handleAddToCart = (e) => {
     e.stopPropagation();
 
-    user &&
-      updateCart(cart, { product, quantity: 1 }, user.token)
-        .then(() => {})
-        .catch((error) => {
-          console.log(error);
-        });
-
     dispatch({
       type: 'ADD_TO_CART',
       payload: { product, quantity: 1 }
@@ -65,22 +58,39 @@ const ProductCard = ({
       type: 'TOGGLE_SHOW',
       payload: true
     });
+
+    user &&
+      updateCart(cart, { product, quantity: 1 }, user.token)
+        .then((res) => {
+          dispatch({
+            type: 'GET_CART_FROM_DB',
+            payload: res.data
+          });
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
   };
 
   const handleRemove = (e, product) => {
     e.stopPropagation();
 
-    user &&
-      updateCart(cart, { product, quantity: 0 }, user.token)
-        .then(() => {})
-        .catch((error) => {
-          console.log(error);
-        });
-
     dispatch({
       type: 'REMOVE_FROM_CART',
       payload: product
     });
+
+    user &&
+      updateCart(cart, { product, quantity: 0 }, user.token)
+        .then((res) => {
+          dispatch({
+            type: 'GET_CART_FROM_DB',
+            payload: res.data
+          });
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
   };
 
   const handleQuantityChange = (quantityValue, product) => {
@@ -90,13 +100,6 @@ const ProductCard = ({
       value > 0 ? (value < product.quantity ? value : product.quantity) : 1;
 
     if (numProduct > 0) {
-      user &&
-        updateCart(cart, { product, quantity: numProduct }, user.token)
-          .then(() => {})
-          .catch((error) => {
-            toast.error(error.message);
-          });
-
       dispatch({
         type: 'CHANGE_QUANTITY',
         payload: {
@@ -104,13 +107,25 @@ const ProductCard = ({
           quantity: numProduct
         }
       });
+
+      user &&
+        updateCart(cart, { product, quantity: numProduct }, user.token)
+          .then((res) => {
+            dispatch({
+              type: 'GET_CART_FROM_DB',
+              payload: res.data
+            });
+          })
+          .catch((error) => {
+            toast.error(error.message);
+          });
     }
   };
 
   const handleWishlist = (e) => {
     e.stopPropagation();
 
-    user && user.token && user.wishlist.find((p) => p._id === _id)
+    user && user.wishlist.find((p) => p._id === _id)
       ? removeFromWishlist(user.token, _id)
           .then(async (res) => {
             const updateUser = await { ...res.data, token: user.token };

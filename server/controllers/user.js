@@ -29,9 +29,11 @@ exports.updateCart = async (req, res) => {
       },
       { cart },
       { new: true }
-    ).exec();
+    )
+      .populate('cart.product')
+      .exec();
 
-    res.json(updated);
+    res.json(updated.cart);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

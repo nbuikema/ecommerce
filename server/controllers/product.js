@@ -81,8 +81,6 @@ exports.listWithQuery = async (req, res) => {
     } else {
       const products = await Product.find()
         .skip(skipBy)
-        .populate('category')
-        .populate('subcategories')
         .sort([[sort, order]])
         .limit(limit)
         .exec();
@@ -103,8 +101,6 @@ exports.listRelated = async (req, res) => {
       category: product.category
     })
       .limit(3)
-      .populate('category')
-      .populate('subcategories')
       .sort([['createdAt', 'desc']])
       .exec();
 
@@ -122,10 +118,7 @@ exports.listAllInCategory = async (req, res) => {
 
     const products = await Product.find({
       category
-    })
-      .populate('category')
-      .populate('subcategories')
-      .exec();
+    }).exec();
 
     res.json({ products, category });
   } catch (error) {
@@ -141,10 +134,7 @@ exports.listAllInSubcategory = async (req, res) => {
 
     const products = await Product.find({
       subcategories: subcategory
-    })
-      .populate('category')
-      .populate('subcategories')
-      .exec();
+    }).exec();
 
     res.json({ products, subcategory });
   } catch (error) {
@@ -194,8 +184,6 @@ const handleQuery = async (req, res) => {
     const products = await Product.find({
       $and: filteredSearch
     })
-      .populate('category')
-      .populate('subcategory')
       .sort([req.body.sort])
       .exec();
 

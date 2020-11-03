@@ -15,11 +15,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: 'customer'
     },
-    cart: {
-      type: Array,
-      default: []
-    },
-    /*cart: [
+    cart: [
       {
         _id: false,
         product: {
@@ -28,7 +24,7 @@ const userSchema = new mongoose.Schema(
         },
         quantity: Number
       }
-    ],*/
+    ],
     address: {
       type: Array,
       default: []

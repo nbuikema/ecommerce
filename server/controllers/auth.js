@@ -34,8 +34,8 @@ exports.createOrUpdateUser = async (req, res) => {
 // read
 exports.currentUser = async (req, res) => {
   try {
-    await User.findOne({ email: req.user.email })
-      .populate({ path: 'cart.product', model: Product })
+    const user = await User.findOne({ email: req.user.email })
+      .populate('cart.product')
       .populate('category')
       .populate('wishlist')
       .populate({
@@ -44,13 +44,9 @@ exports.currentUser = async (req, res) => {
           path: 'products.product'
         }
       })
-      .exec(async (error, user) => {
-        if (error) {
-          throw new Error(error);
-        }
+      .exec();
 
-        res.json(user);
-      });
+    res.json(user);
 
     await User.findOneAndUpdate(
       { email: req.user.email },
