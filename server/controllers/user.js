@@ -6,12 +6,14 @@ exports.updateCart = async (req, res) => {
     const { cart, cartItem } = req.body;
 
     if (cartItem) {
-      let existsIndex = cart
+      const existsIndex = cart
         .map((item) => item.product._id)
         .indexOf(cartItem.product._id);
 
       if (existsIndex === -1) {
         cart.push(cartItem);
+      } else if (existsIndex > -1 && cartItem.quantity > 0) {
+        cart.splice(existsIndex, 1, cartItem);
       } else if (existsIndex > -1 && cartItem.quantity === 0) {
         cart.splice(existsIndex, 1);
       }

@@ -8,14 +8,16 @@ import ProductCard from '../cards/ProductCard';
 import { Drawer } from 'antd';
 
 const CartDrawerModal = () => {
-  const { cart, drawer, user } = useSelector((state) => ({ ...state }));
+  const {
+    cart: { cart, showDrawer },
+    user
+  } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
   const handleDrawerToggle = () => {
     dispatch({
-      type: 'TOGGLE_SHOW',
-      payload: false
+      type: 'TOGGLE_CART'
     });
   };
 
@@ -34,7 +36,7 @@ const CartDrawerModal = () => {
 
   return (
     <Drawer
-      visible={drawer}
+      visible={showDrawer}
       onClose={handleDrawerToggle}
       title="Cart"
       className="text-center"

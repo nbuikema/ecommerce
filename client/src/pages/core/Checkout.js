@@ -34,7 +34,10 @@ const Checkout = () => {
   const [succeeded, setSucceeded] = useState(false);
   const [processing, setProcessing] = useState('');
 
-  const { cart, user } = useSelector((state) => ({ ...state }));
+  const {
+    cart: { cart },
+    user
+  } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 

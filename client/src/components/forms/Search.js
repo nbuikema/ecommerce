@@ -23,7 +23,7 @@ const Search = () => {
       payload: { text: search }
     });
 
-    history.push(`/shop?text=${search}`);
+    history.push('/shop');
   };
 
   return (

@@ -2,13 +2,18 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { updateCart } from '../../api/user';
+import { toast } from 'react-toastify';
 
 import ImageModal from '../../components/modals/ImageModal';
 
+import { InputNumber } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 
 const Cart = () => {
-  const { cart, user } = useSelector((state) => ({ ...state }));
+  const {
+    cart: { cart },
+    user
+  } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
@@ -22,28 +27,29 @@ const Cart = () => {
     );
   };
 
-  const handleQuantityChange = (product, e) => {
-    const value = parseInt(e.target.value);
+  const handleQuantityChange = (quantityValue, product) => {
+    const value = parseInt(quantityValue);
 
-    let numProduct;
-    numProduct =
+    const numProduct =
       value > 0 ? (value < product.quantity ? value : product.quantity) : 1;
 
     if (numProduct > 0) {
-      user &&
-        updateCart(cart, { product, quantity: numProduct }, user.token)
-          .then(() => {})
-          .catch((error) => {
-            console.log(error);
-          });
-
       dispatch({
         type: 'CHANGE_QUANTITY',
-        payload: {
-          product,
-          quantity: numProduct
-        }
+        payload: { product, quantity: numProduct }
       });
+
+      user &&
+        updateCart(cart, { product, quantity: numProduct }, user.token)
+          .then((res) => {
+            dispatch({
+              type: 'GET_CART_FROM_DB',
+              payload: res.data
+            });
+          })
+          .catch((error) => {
+            toast.error(error.message);
+          });
     }
   };
 
@@ -92,15 +98,22 @@ const Cart = () => {
                 </td>
                 <td>{item.product.title}</td>
                 <td>${item.product.price}</td>
-                <td style={{ width: '120px' }}>
-                  <input
-                    type="number"
-                    className="form-control"
-                    value={item.quantity}
-                    onChange={(e) => handleQuantityChange(item.product, e)}
-                  />
+                <td>
+                  <div>
+                    <InputNumber
+                      min={1}
+                      max={item.product.quantity}
+                      value={item.quantity}
+                      onChange={(value) =>
+                        handleQuantityChange(value, item.product)
+                      }
+                      onClick={(e) => e.preventDefault()}
+                    />
+                  </div>
                 </td>
-                <td>${item.product.price * item.quantity}</td>
+                <td>
+                  ${parseFloat((item.product.price * item.quantity).toFixed(2))}
+                </td>
                 <td className="text-center">
                   <CloseOutlined
                     onClick={() => handleRemove(item.product)}

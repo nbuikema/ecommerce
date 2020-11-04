@@ -21,7 +21,10 @@ const { SubMenu, Item } = Menu;
 const Header = () => {
   const [current, setCurrent] = useState('');
 
-  const { user, cart } = useSelector((state) => ({ ...state }));
+  const {
+    user,
+    cart: { cart }
+  } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
@@ -54,8 +57,7 @@ const Header = () => {
 
   const handleDrawerToggle = () => {
     dispatch({
-      type: 'TOGGLE_SHOW',
-      payload: true
+      type: 'TOGGLE_CART'
     });
   };
 

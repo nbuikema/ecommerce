@@ -38,7 +38,10 @@ const ProductCard = ({
     quantity: productQuantity
   } = product;
 
-  const { cart, user } = useSelector((state) => ({ ...state }));
+  const {
+    cart: { cart },
+    user
+  } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
@@ -55,7 +58,7 @@ const ProductCard = ({
     });
 
     dispatch({
-      type: 'TOGGLE_SHOW',
+      type: 'TOGGLE_CART',
       payload: true
     });
 
@@ -102,10 +105,7 @@ const ProductCard = ({
     if (numProduct > 0) {
       dispatch({
         type: 'CHANGE_QUANTITY',
-        payload: {
-          product,
-          quantity: numProduct
-        }
+        payload: { product, quantity: numProduct }
       });
 
       user &&

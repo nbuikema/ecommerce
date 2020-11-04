@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getProductsWithFilter } from '../../api/product';
 import { getAllCategories } from '../../api/category';
 import { getAllSubcategories } from '../../api/subcategory';
-import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 import ProductCard from '../../components/cards/ProductCard';
 import RatingsForm from '../../components/forms/RatingsForm';
@@ -30,14 +29,30 @@ const Shop = () => {
   const [shipping, setShipping] = useState(null);
   const [sort, setSort] = useState(['Best Sellers', 'sold', 'desc']);
 
-  const {
-    search: { text }
-  } = useSelector((state) => ({ ...state }));
+  const { search } = useSelector((state) => ({ ...state }));
 
-  const history = useHistory();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let subscribed = true;
+
+    setSort(search.sort);
+    setPrice(search.price);
+    setCategories(search.categories);
+    setSubcategories(search.subcategories);
+    setRating(search.rating);
+    setShipping(search.shipping);
+
+    let submitPrice = [];
+    if (!search.price[0] && !search.price[1]) {
+      submitPrice = [0, 100000000000];
+    } else if (search.price[0] && !search.price[1]) {
+      submitPrice = [search.price[0], 100000000000];
+    } else if (search.price[1] && !search.price[0]) {
+      submitPrice = [0, search.price[1]];
+    } else {
+      submitPrice = search.price;
+    }
 
     getAllCategories().then((categories) => {
       if (subscribed) {
@@ -51,42 +66,14 @@ const Shop = () => {
       }
     });
 
-    if (history.location.search && history.location.search.length > 0) {
-      const params = history.location.search.split('?');
-      params.shift();
-
-      let search = [];
-      params.forEach((param) => {
-        search.push(param.split('='));
-      });
-
-      search.forEach((filter) => {
-        if (filter[0] === 'shipping') {
-          const booleanShipping = filter[1] === 'true';
-          setShipping(booleanShipping);
-        }
-      });
-    }
-
-    let submitPrice = [];
-    if (!price[0] && !price[1]) {
-      submitPrice = [0, 100000000000];
-    } else if (price[0] && !price[1]) {
-      submitPrice = [price[0], 100000000000];
-    } else if (price[1] && !price[0]) {
-      submitPrice = [0, price[1]];
-    } else {
-      submitPrice = price;
-    }
-
     getProductsWithFilter({
-      query: text,
+      query: search.text,
       price: submitPrice,
-      categories,
-      subcategories,
-      rating,
-      shipping,
-      sort: [sort[1], sort[2]]
+      categories: search.categories,
+      subcategories: search.subcategories,
+      rating: search.rating,
+      shipping: search.shipping,
+      sort: [search.sort[1], search.sort[2]]
     }).then((products) => {
       if (subscribed) {
         setProducts(products.data);
@@ -96,7 +83,7 @@ const Shop = () => {
     return () => (subscribed = false);
 
     // eslint-disable-next-line
-  }, [text]);
+  }, [search.text]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -112,8 +99,20 @@ const Shop = () => {
       submitPrice = price;
     }
 
+    dispatch({
+      type: 'SEARCH_QUERY',
+      payload: {
+        sort,
+        price,
+        categories,
+        subcategories,
+        rating,
+        shipping
+      }
+    });
+
     getProductsWithFilter({
-      query: text,
+      query: search.text,
       price: submitPrice,
       categories,
       subcategories,
@@ -122,49 +121,6 @@ const Shop = () => {
       sort: [sort[1], sort[2]]
     }).then((products) => {
       setProducts(products.data);
-
-      let path = '';
-
-      if (text) {
-        path += `?text=${text}`;
-      }
-      if (price[0]) {
-        path += `?price=gt${price[0]}`;
-      }
-      if (price[1]) {
-        path += `?price=lt${price[1]}`;
-      }
-      if (categories && categories.length > 0) {
-        path += `?categories=`;
-        categories.forEach((category, index, categories) => {
-          if (Object.is(categories.length - 1, index)) {
-            path += `${category}`;
-          } else {
-            path += `${category}&`;
-          }
-        });
-      }
-      if (subcategories && subcategories.length > 0) {
-        path += `?subcategories=`;
-        subcategories.forEach((subcategory, index, subcategories) => {
-          if (Object.is(subcategories.length - 1, index)) {
-            path += `${subcategory}`;
-          } else {
-            path += `${subcategory}&`;
-          }
-        });
-      }
-      if (rating) {
-        path += `?rating=${rating}`;
-      }
-      if (shipping !== null) {
-        path += `?shipping=${shipping}`;
-      }
-      if (sort) {
-        path += `?sort=${sort[1]}-${sort[2]}`;
-      }
-
-      history.push(`/shop${path}`);
     });
   };
 
