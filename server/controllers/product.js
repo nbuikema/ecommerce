@@ -147,6 +147,11 @@ const handleQuery = async (req, res) => {
     let filteredSearch = [];
     let foundProducts = [];
 
+    const { limit, page } = req.body;
+    const currentPage = page;
+    const perPage = limit;
+    const skipBy = (currentPage - 1) * perPage;
+
     for (let [key, value] of Object.entries(req.body)) {
       if (key === 'query' && value.length > 0) {
         filteredSearch.push({ $text: { $search: value } });
@@ -184,10 +189,12 @@ const handleQuery = async (req, res) => {
     const products = await Product.find({
       $and: filteredSearch
     })
+      .skip(skipBy)
+      .limit(limit)
       .sort([req.body.sort])
       .exec();
 
-    res.json(products);
+    return products;
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -195,7 +202,19 @@ const handleQuery = async (req, res) => {
 
 exports.searchFilters = async (req, res) => {
   try {
-    await handleQuery(req, res);
+    const products = await handleQuery(req, res);
+
+    res.json(products);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.listCountWithFilters = async (req, res) => {
+  try {
+    const products = await handleQuery(req, res);
+
+    res.json(products.length);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

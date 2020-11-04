@@ -22,6 +22,13 @@ export const getProductsCount = async () => {
   return await axios.get(`${process.env.REACT_APP_API}/products/count`);
 };
 
+export const getProductsCountWithFilter = async (args) => {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/products/count/search/filters`,
+    args
+  );
+};
+
 export const getProductsWithQuery = async (sort, order, limit, page) => {
   return await axios.post(`${process.env.REACT_APP_API}/products/query`, {
     sort,

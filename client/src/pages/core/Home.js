@@ -1,7 +1,7 @@
 import React from 'react';
 import Typewriter from 'typewriter-effect';
 
-import ProductsDisplay from '../../components/displays/ProductsDisplay';
+import HomeDisplay from '../../components/displays/HomeDisplay';
 import CategoryDisplay from '../../components/displays/CategoryDisplay';
 
 const Home = () => {
@@ -17,14 +17,14 @@ const Home = () => {
           }}
         />
       </div>
-      <ProductsDisplay
+      <HomeDisplay
         name="New Arrivals"
         sort="createdAt"
         order="desc"
         limit={3}
       />
-      <ProductsDisplay name="Best Sellers" sort="sold" order="desc" limit={3} />
-      <ProductsDisplay
+      <HomeDisplay name="Best Sellers" sort="sold" order="desc" limit={3} />
+      <HomeDisplay
         name="Popular Products"
         sort="averageRating"
         order="1"

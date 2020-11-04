@@ -8,33 +8,40 @@ import LoadingForm from '../../components/forms/LoadingForm';
 
 import { Pagination } from 'antd';
 
-const ProductsDisplay = ({ name, sort, order, limit }) => {
+const HomeDisplay = ({ name, sort, order, limit }) => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [productsCount, setProductsCount] = useState(0);
   const [page, setPage] = useState(1);
+  const [loadingCount, setLoadingCount] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingCount(true);
 
     getProductsCount()
       .then((res) => {
         setProductsCount(res.data);
-        getProductsWithQuery(sort, order, limit, page)
-          .then((res) => {
-            setProducts(res.data);
-            setLoading(false);
-          })
-          .catch((error) => {
-            toast.error(error.message);
-
-            setLoading(false);
-          });
+        setLoadingCount(false);
       })
       .catch((error) => {
         toast.error(error.message);
 
-        setLoading(false);
+        setLoadingCount(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    setLoadingProducts(true);
+
+    getProductsWithQuery(sort, order, limit, page)
+      .then((res) => {
+        setProducts(res.data);
+        setLoadingProducts(false);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+
+        setLoadingProducts(false);
       });
   }, [sort, order, limit, page]);
 
@@ -43,7 +50,7 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
       <h4 className="text-center p-3 mb-5 display-4 jumbotron">{name}</h4>
       <div className="container">
         <div className="row">
-          {loading ? (
+          {loadingCount ? (
             <>
               <div className="col-md-4 pb-3">
                 <LoadingCard showCustomer={true} />
@@ -67,7 +74,7 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
         </div>
       </div>
       <div className="row">
-        {loading ? (
+        {loadingCount ? (
           <div className="col-md-4 offset-md-4 text-center pt-5 p-3">
             <LoadingForm />
           </div>
@@ -75,9 +82,12 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
           <nav className="col-md-4 offset-md-4 text-center pt-5 p-3">
             <Pagination
               current={page}
-              total={(productsCount / limit) * 10}
+              total={productsCount}
+              pageSize={limit}
+              showSizeChanger={false}
               onChange={(value) => setPage(value)}
               className="text-center"
+              disabled={loadingProducts}
             />
           </nav>
         )}
@@ -86,4 +96,4 @@ const ProductsDisplay = ({ name, sort, order, limit }) => {
   );
 };
 
-export default ProductsDisplay;
+export default HomeDisplay;

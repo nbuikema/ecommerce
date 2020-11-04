@@ -16,7 +16,8 @@ const {
   listAllInSubcategory,
   searchFilters,
   getProductsByDate,
-  getProductsByInventory
+  getProductsByInventory,
+  listCountWithFilters
 } = require('../controllers/product');
 
 // middleware
@@ -28,6 +29,7 @@ router.post('/product', authCheck, adminCheck, create);
 // read
 router.get('/product/:slug', read);
 router.get('/products/count', listCount);
+router.post('/products/count/search/filters', listCountWithFilters);
 router.post('/products/query', listWithQuery);
 router.get('/products/related/:productId', listRelated);
 router.get('/products/category/:categorySlug', listAllInCategory);
