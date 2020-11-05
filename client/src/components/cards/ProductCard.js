@@ -1,23 +1,22 @@
 import React from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCart, addToWishlist, removeFromWishlist } from '../../api/user';
 import { toast } from 'react-toastify';
 
 import AverageRatingDisplay from '../displays/AverageRatingDisplay';
 
-import { Card, Badge, InputNumber } from 'antd';
+import { Card, InputNumber } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
   ShoppingCartOutlined,
   CloseOutlined,
   HeartFilled,
-  HeartOutlined
+  HeartOutlined,
+  CheckOutlined
 } from '@ant-design/icons';
 const { Meta } = Card;
-const { Ribbon } = Badge;
 
 const ProductCard = ({
   product,
@@ -34,7 +33,6 @@ const ProductCard = ({
     description,
     images,
     price,
-    createdAt,
     quantity: productQuantity
   } = product;
 
@@ -46,8 +44,6 @@ const ProductCard = ({
   const dispatch = useDispatch();
 
   const history = useHistory();
-
-  const anHourAgo = moment(Date.now() - 60 * 60 * 1000).toDate();
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -75,7 +71,7 @@ const ProductCard = ({
         });
   };
 
-  const handleRemove = (e, product) => {
+  const handleRemove = (e) => {
     e.stopPropagation();
 
     dispatch({
@@ -176,22 +172,32 @@ const ProductCard = ({
     }
     if (showCustomer) {
       return [
-        <button
-          onClick={handleAddToCart}
-          disabled={productQuantity < 1}
-          className="w-100 h-100 m-0 p-0"
-          style={{
-            cursor: 'pointer',
-            border: 'none',
-            backgroundColor: 'inherit'
-          }}
-        >
-          <ShoppingCartOutlined
-            className={productQuantity < 1 ? 'text-danger' : 'text-success'}
-          />
-          <br />
-          {productQuantity < 1 ? 'Out of Stock' : 'Add to Cart'}
-        </button>,
+        <>
+          {cart.find((cartItem) => cartItem.product._id === _id) ? (
+            <div onClick={handleRemove} style={{ cursor: 'pointer' }}>
+              <CheckOutlined className="text-success" />
+              <br />
+              Added
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={productQuantity < 1}
+              className="w-100 h-100 m-0 p-0"
+              style={{
+                cursor: 'pointer',
+                border: 'none',
+                backgroundColor: 'inherit'
+              }}
+            >
+              <ShoppingCartOutlined
+                className={productQuantity < 1 ? 'text-danger' : 'text-success'}
+              />
+              <br />
+              {productQuantity < 1 ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          )}
+        </>,
         <div onClick={handleWishlist} style={{ cursor: 'pointer' }}>
           {user && user.token && user.wishlist.find((p) => p._id === _id) ? (
             <HeartFilled className="text-info" />
@@ -222,7 +228,7 @@ const ProductCard = ({
             Quantity
           </span>
         </div>,
-        <div onClick={(e) => handleRemove(e, product)}>
+        <div onClick={handleRemove}>
           <CloseOutlined
             className="text-danger mt-2"
             style={{ fontSize: '20px' }}
@@ -234,7 +240,7 @@ const ProductCard = ({
     }
   };
 
-  const card = () => (
+  return (
     <div
       className="d-flex w-100"
       onClick={() => history.push(`/product/${slug}`)}
@@ -268,12 +274,6 @@ const ProductCard = ({
       </Card>
     </div>
   );
-
-  if (moment(createdAt).toDate() > anHourAgo) {
-    return <Ribbon text="New Product!">{card()}</Ribbon>;
-  } else {
-    return <>{card()}</>;
-  }
 };
 
 export default ProductCard;

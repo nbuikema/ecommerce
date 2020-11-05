@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { SearchOutlined } from '@ant-design/icons';
+import './NavSearch.css';
 
 const Search = () => {
   const [search, setSearch] = useState('');
@@ -27,15 +28,19 @@ const Search = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-inline my-0">
+    <form onSubmit={handleSubmit} className="form-inline">
       <input
         value={search}
         onChange={handleChange}
         type="search"
-        className="form-control mr-2"
+        className="form-control"
         placeholder="Search Anything"
       />
-      <SearchOutlined onClick={handleSubmit} style={{ cursor: 'pointer' }} />
+      <SearchOutlined
+        className="search-icon"
+        onClick={handleSubmit}
+        style={{ cursor: 'pointer' }}
+      />
     </form>
   );
 };

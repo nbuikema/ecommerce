@@ -1,0 +1,75 @@
+.navbar {
+  transition: top 0.5s ease;
+  height: 62px;
+}
+
+.hide {
+  top: -62px;
+}
+
+.navbar-nav .nav-link,
+.navbar-nav .nav-link:hover {
+  font-size: 18px;
+  font-family: 'Delius', cursive;
+  text-transform: none;
+  color: #2c1802 !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.nav-item:after {
+  position: relative;
+  display: block;
+  content: '';
+  border-bottom: 2px solid #2c1802;
+  transform: scaleX(0);
+  transition: transform 300ms ease-in-out;
+  bottom: 4px;
+}
+
+.nav-item:hover:after {
+  transform: scaleX(1);
+}
+
+.active:after {
+  position: relative;
+  display: block;
+  content: '';
+  border-bottom: 2px solid #2c1802;
+  transform: scaleX(1);
+  transition: transform 300ms ease-in-out;
+  bottom: 4px;
+}
+
+.cart {
+  margin-bottom: -1px;
+}
+
+.navbar-light {
+  background-color: #fbf4e1;
+}
+
+.dropdown-menu {
+  left: inherit;
+  top: inherit;
+  background-color: #fbf4e1;
+}
+
+.dropdown-toggle:after {
+  border-top-color: #2c1802;
+}
+
+.dropdown-item:hover {
+  background-color: #fbf4e1;
+}
+
+.navbar-collapse.collapsing,
+.navbar-collapse.collapse.show {
+  position: absolute;
+  top: 62px;
+  left: 0;
+  background-color: #fbf4e1;
+  width: 100%;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}

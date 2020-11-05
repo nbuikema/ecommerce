@@ -12,7 +12,7 @@ import ProductFilterForm from '../../components/forms/ProductFilterForm';
 const Shop = () => {
   const [products, setProducts] = useState([]);
   const [productsCount, setProductsCount] = useState(0);
-  const [limit] = useState(3);
+  const [limit] = useState(6);
   const [page, setPage] = useState(1);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingProductsCount, setLoadingProductsCount] = useState(false);

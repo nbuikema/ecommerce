@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import UserRoute from './components/auth/UserRoute';
 import AdminRoute from './components/auth/AdminRoute';
 import NoPage from './components/auth/NoPage';
-import Header from './components/nav/Header';
+import Header from './components/nav/Header/Header';
 
 import Home from './pages/core/Home';
 import Product from './pages/core/Product';

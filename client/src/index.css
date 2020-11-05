@@ -1,3 +1,7 @@
+body {
+  overflow-y: scroll;
+}
+
 .ant-card-body {
   flex-grow: 1;
 }
