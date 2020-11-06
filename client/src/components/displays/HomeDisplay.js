@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getProductsWithQuery, getProductsCount } from '../../../api/product';
+import { getProductsWithQuery, getProductsCount } from '../../api/product';
 import { toast } from 'react-toastify';
 
-import ProductCard from '../../../components/cards/ProductCard';
-import LoadingCard from '../../../components/cards/LoadingCard';
-import LoadingForm from '../../../components/forms/LoadingForm';
+import ProductCard from '../../components/cards/ProductCard';
+import LoadingCard from '../../components/cards/LoadingCard';
+import LoadingForm from '../../components/forms/LoadingForm';
 
 import { Pagination } from 'antd';
 
@@ -47,27 +47,30 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
 
   return (
     <div className="pb-5 bg-primary">
-      <h4 className="text-center p-3 mb-5 display-4 jumbotron text-primary">
+      <h3 className="text-center p-3 mb-5 display-3 jumbotron text-primary">
         {name}
-      </h4>
-      <div className="container">
-        <div className="row">
+      </h3>
+      <div className="container-fluid">
+        <div className="row mx-sm-5 mx-md-0 mx-xl-5 px-3 px-lg-5">
           {loadingCount ? (
             <>
-              <div className="col-md-4 pb-3">
+              <div className="col-md-4 pb-3 px-2 px-lg-4">
                 <LoadingCard showCustomer={true} />
               </div>
-              <div className="col-md-4 pb-3">
+              <div className="col-md-4 pb-3 px-2 px-lg-4">
                 <LoadingCard showCustomer={true} />
               </div>
-              <div className="col-md-4 pb-3">
+              <div className="col-md-4 pb-3 px-2 px-lg-4">
                 <LoadingCard showCustomer={true} />
               </div>
             </>
           ) : (
             <>
               {products.map((product) => (
-                <div className="col-md-4 pb-3 d-flex" key={product._id}>
+                <div
+                  className="col-md-4 pb-3 d-flex px-2 px-lg-4"
+                  key={product._id}
+                >
                   <ProductCard product={product} showCustomer={true} />
                 </div>
               ))}

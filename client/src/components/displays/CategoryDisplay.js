@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllCategories } from '../../../api/category';
-import { getAllSubcategories } from '../../../api/subcategory';
+import { getAllCategories } from '../../api/category';
+import { getAllSubcategories } from '../../api/subcategory';
 import { toast } from 'react-toastify';
 
-import LoadingForm from '../../../components/forms/LoadingForm';
+import LoadingForm from '../../components/forms/LoadingForm';
 
 const CategoryDisplay = ({ name }) => {
   const [categories, setCategories] = useState([]);
@@ -40,11 +40,11 @@ const CategoryDisplay = ({ name }) => {
 
   return (
     <div className="pb-5 bg-primary">
-      <h4 className="text-center p-3 mb-5 display-4 jumbotron text-primary">
+      <h3 className="text-center p-3 mb-5 display-3 jumbotron text-primary">
         {name}
-      </h4>
-      <div className="container">
-        <div className="row">
+      </h3>
+      <div className="container-fluid">
+        <div className="row mx-sm-5">
           {loading ? (
             <div className="m-3 col">
               <LoadingForm />

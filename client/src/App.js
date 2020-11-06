@@ -11,7 +11,7 @@ import AdminRoute from './components/auth/AdminRoute';
 import NoPage from './components/auth/NoPage';
 import Header from './components/nav/Header/Header';
 
-import Home from './pages/core/Home/Home';
+import Home from './pages/core/Home';
 import Product from './pages/core/Product';
 import Category from './pages/core/Category';
 import Shop from './pages/core/Shop';

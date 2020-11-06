@@ -1,4 +1,8 @@
 body {
+  overflow-x: hidden;
+}
+
+body {
   overflow-y: scroll;
 }
 
@@ -8,6 +12,10 @@ body {
 
 .bg-primary {
   background-color: #fbf4e1 !important;
+}
+
+.jumbotron {
+  background-color: #fbf4e1;
 }
 
 .btn.btn-raised.btn-light,
@@ -23,13 +31,19 @@ body {
   color: #2c1802 !important;
 }
 
-.ant-card-body {
-  flex-grow: 1;
+.ant-card-hoverable:hover {
+  -webkit-box-shadow: 5px 5px 20px 5px rgba(44, 24, 2, 0.7) !important;
+  box-shadow: 5px 5px 20px 5px rgba(44, 24, 2, 0.7) !important;
 }
 
-.ant-ribbon-wrapper {
-  display: flex;
-  width: 100%;
+.ant-card-hoverable {
+  -webkit-box-shadow: 0;
+  box-shadow: 0;
+  transition: box-shadow 0.3s, border-color 0.3s, -webkit-box-shadow 0.3s;
+}
+
+.ant-card-body {
+  flex-grow: 1;
 }
 
 .carousel .carousel-control-prev-icon {
@@ -92,4 +106,11 @@ body {
 
 .bmd-form-group {
   padding-top: 0;
+}
+
+@media (min-width: 1200px) {
+  .mx-xl-5 {
+    margin-left: 5rem !important;
+    margin-right: 5rem !important;
+  }
 }
