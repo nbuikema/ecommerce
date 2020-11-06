@@ -41,7 +41,7 @@ const CartDrawerModal = () => {
       title="Cart"
       className="text-center"
       placement="right"
-      width={400}
+      width={375}
     >
       {!cart.length ? (
         <p>

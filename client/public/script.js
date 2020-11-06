@@ -1,13 +1,26 @@
-let lastScrollTop = 0;
-$(window).scroll(function () {
-  const currentScrollTop = $(this).scrollTop();
-  const nav = $('.navbar');
-  setTimeout(function () {
-    if (currentScrollTop > lastScrollTop) {
-      nav.addClass('hide');
-    } else {
-      nav.removeClass('hide');
+$(document).ready(() => {
+  let lastScrollTop = 0;
+  $(window).scroll(() => {
+    const currentScrollTop = $(this).scrollTop();
+    const nav = $('.navbar');
+    setTimeout(function () {
+      if (currentScrollTop > lastScrollTop) {
+        nav.addClass('hide');
+        $('.navbar-collapse').collapse('hide');
+      } else {
+        nav.removeClass('hide');
+      }
+      lastScrollTop = currentScrollTop;
+    }, 100);
+  });
+
+  $(window).click(() => {
+    $('.navbar-collapse').collapse('hide');
+  });
+
+  $(window).resize(() => {
+    if ($(window).width() >= 768 && $('.navbar-collapse').hasClass('show')) {
+      $('.navbar-collapse').removeClass('show');
     }
-    lastScrollTop = currentScrollTop;
-  }, 100);
+  });
 });

@@ -42,7 +42,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light sticky-top">
+    <nav className="navbar navbar-expand-md navbar-light sticky-top">
       <Link className="navbar-brand" to="/">
         Home
       </Link>

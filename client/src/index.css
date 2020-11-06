@@ -1,17 +1,32 @@
 body {
   overflow-x: hidden;
-}
-
-body {
   overflow-y: scroll;
+  background-color: #fbf4e1 !important;
 }
 
-.text-primary {
+.text-primary,
+.ant-drawer-close {
   color: #2c1802 !important;
 }
 
-.bg-primary {
+.bg-primary,
+.ant-drawer-header,
+.ant-drawer-body {
   background-color: #fbf4e1 !important;
+}
+
+.badge-primary {
+  background-color: #2c1802 !important;
+}
+
+.ant-drawer-title {
+  color: #2c1802 !important;
+  font-size: 1.3rem !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: red !important;
+  border-color: red !important;
 }
 
 .jumbotron {

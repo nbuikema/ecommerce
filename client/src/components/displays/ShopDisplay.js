@@ -17,33 +17,35 @@ const ShopDisplay = ({
 }) => {
   return (
     <div>
-      <h4>Products</h4>
-      <h6>
-        {loadingProductsCount
-          ? 'Loading...'
-          : productsCount > 0
-          ? `${productsCount} ${
-              productsCount === 1 ? 'product' : 'products'
-            } found`
-          : 'No products found'}
-      </h6>
-      <div className="row">
+      <div className="row mx-sm-5 mx-md-0 px-3 px-md-0">
         {loadingProducts ? (
           <>
-            <div className="col-md-4 pb-3">
+            <div className="col-md-6 col-xl-4 pb-3 px-2">
               <LoadingCard showCustomer={true} />
             </div>
-            <div className="col-md-4 pb-3">
+            <div className="col-md-6 col-xl-4 pb-3 px-2">
               <LoadingCard showCustomer={true} />
             </div>
-            <div className="col-md-4 pb-3">
+            <div className="col-md-6 col-xl-4 pb-3 px-2">
+              <LoadingCard showCustomer={true} />
+            </div>
+            <div className="col-md-6 col-xl-4 pb-3 px-2">
+              <LoadingCard showCustomer={true} />
+            </div>
+            <div className="col-md-6 col-xl-4 pb-3 px-2">
+              <LoadingCard showCustomer={true} />
+            </div>
+            <div className="col-md-6 col-xl-4 pb-3 px-2">
               <LoadingCard showCustomer={true} />
             </div>
           </>
         ) : (
           <>
             {products.map((product) => (
-              <div className="col-md-4 pb-3 d-flex" key={product._id}>
+              <div
+                className="col-md-6 col-xl-4 pb-3 d-flex px-2"
+                key={product._id}
+              >
                 <ProductCard product={product} showCustomer={true} />
               </div>
             ))}

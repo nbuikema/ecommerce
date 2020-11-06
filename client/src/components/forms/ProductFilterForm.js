@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getAllCategories } from '../../api/category';
 import { getAllSubcategories } from '../../api/subcategory';
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,7 +12,8 @@ import {
   DownSquareOutlined,
   StarOutlined,
   SearchOutlined,
-  SortAscendingOutlined
+  SortAscendingOutlined,
+  CloseOutlined
 } from '@ant-design/icons';
 const { SubMenu } = Menu;
 const { Option } = Select;
@@ -41,6 +42,14 @@ const ProductFilterForm = ({
 
   const dispatch = useDispatch();
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   useEffect(() => {
     setLoadingFilters(true);
     setSort(search.sort);
@@ -51,12 +60,16 @@ const ProductFilterForm = ({
     setShipping(search.shipping);
 
     getAllCategories().then((categories) => {
-      setAllCategories(categories.data);
+      if (!unmounted.current) {
+        setAllCategories(categories.data);
+      }
     });
 
     getAllSubcategories().then((subcategories) => {
-      setAllSubcategories(subcategories.data);
-      setLoadingFilters(false);
+      if (!unmounted.current) {
+        setAllSubcategories(subcategories.data);
+        setLoadingFilters(false);
+      }
     });
 
     // eslint-disable-next-line
@@ -118,241 +131,237 @@ const ProductFilterForm = ({
   };
 
   return (
-    <div>
-      <h4>Search/Filter</h4>
-      <hr />
-      <Menu
-        defaultOpenKeys={[
-          'price',
-          'category',
-          'subcategory',
-          'rating',
-          'sort',
-          'shipping'
-        ]}
-        mode="inline"
+    <Menu
+      defaultOpenKeys={[
+        'price',
+        'category',
+        'subcategory',
+        'rating',
+        'sort',
+        'shipping'
+      ]}
+      mode="inline"
+      className="bg-primary text-primary border-right border-top mt-lg-3"
+    >
+      <SubMenu
+        key="sort"
+        title={
+          <span className="h5">
+            <SortAscendingOutlined />
+            Sort By
+          </span>
+        }
       >
-        <SubMenu
-          key="sort"
-          title={
-            <span className="h6">
-              <SortAscendingOutlined />
-              Sort By
-            </span>
-          }
-        >
-          <div className="pl-4">
-            <Select
-              className="w-100"
-              value={sort}
-              onChange={(value) => setSort(value)}
-            >
-              <Option value={['Best Sellers', 'sold', 'desc']}>
-                Best Sellers
-              </Option>
-              <Option value={['Price: Low to High', 'price', 'asc']}>
-                Price: Low to High
-              </Option>
-              <Option value={['Price: High to Low', 'price', 'desc']}>
-                Price: High to Low
-              </Option>
-            </Select>
-          </div>
-        </SubMenu>
-        <SubMenu
-          key="price"
-          title={
-            <span className="h6">
-              <DollarOutlined />
-              Price
-            </span>
-          }
-          className="mt-4"
-        >
-          <div className="pl-4">
-            <span>
-              ${' '}
-              <InputNumber
-                placeholder="Min"
-                value={price[0]}
-                onChange={(value) => setPrice([value, price[1]])}
-                min={0}
-              />
-            </span>
-            {'    '}-{'    '}
-            <span>
-              ${' '}
-              <InputNumber
-                placeholder="Max"
-                value={price[1]}
-                onChange={(value) => setPrice([price[0], value])}
-                min={price[0] + 1}
-              />
-            </span>
-          </div>
-        </SubMenu>
-        <SubMenu
-          key="category"
-          title={
-            <span className="h6">
-              <DownSquareOutlined />
-              Categories
-            </span>
-          }
-          className="mt-4"
-        >
-          <div className="pl-4">
-            {loadingFilters ? (
-              <div className="mr-4">
-                <LoadingForm />
-              </div>
-            ) : (
-              allCategories &&
-              allCategories.length > 0 &&
-              allCategories.map((category) => (
-                <div key={category._id}>
-                  <Checkbox
-                    name="category"
-                    className="pb-2"
-                    value={category._id}
-                    onChange={handleCategories}
-                    checked={categories.includes(category._id)}
-                  >
-                    {category.name}
-                  </Checkbox>
-                </div>
-              ))
-            )}
-          </div>
-        </SubMenu>
-        <SubMenu
-          key="subcategory"
-          title={
-            <span className="h6">
-              <DownSquareOutlined />
-              Subcategories
-            </span>
-          }
-          className="mt-4"
-        >
-          <div className="pl-4">
-            {loadingFilters ? (
-              <div className="mr-4">
-                <LoadingForm />
-              </div>
-            ) : (
-              allSubcategories &&
-              allSubcategories.length > 0 &&
-              allSubcategories.map((subcategory) => (
-                <div
-                  onClick={() => handleSubcategories(subcategory._id)}
-                  key={subcategory._id}
-                  className={`p-1 m-1 badge ${
-                    subcategories.includes(subcategory._id)
-                      ? 'badge-danger'
-                      : 'badge-secondary'
-                  }`}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {subcategory.name}
-                </div>
-              ))
-            )}
-          </div>
-        </SubMenu>
-        <SubMenu
-          key="rating"
-          title={
-            <span className="h6">
-              <StarOutlined />
-              Rating
-            </span>
-          }
-          className="mt-4"
-        >
-          <div className="pl-4">
-            <RatingsForm
-              starClick={handleRating}
-              numberOfStars={5}
-              rating={rating}
-            />
-            <br />
-            <RatingsForm
-              starClick={handleRating}
-              numberOfStars={4}
-              rating={rating}
-            />
-            <br />
-            <RatingsForm
-              starClick={handleRating}
-              numberOfStars={3}
-              rating={rating}
-            />
-            <br />
-            <RatingsForm
-              starClick={handleRating}
-              numberOfStars={2}
-              rating={rating}
-            />
-            <br />
-            <RatingsForm
-              starClick={handleRating}
-              numberOfStars={1}
-              rating={rating}
-            />
-          </div>
-        </SubMenu>
-        <SubMenu
-          key="shipping"
-          title={
-            <span className="h6">
-              <SortAscendingOutlined />
-              Shipping
-            </span>
-          }
-          className="mt-4"
-        >
-          <div className="pl-4">
-            <Select
-              className="w-100"
-              defaultValue={null}
-              value={shipping && shipping}
-              onChange={(value) => setShipping(value)}
-            >
-              <Option value={null}>Select</Option>
-              <Option value={true}>Yes</Option>
-              <Option value={false}>No</Option>
-            </Select>
-          </div>
-        </SubMenu>
-        <div className="mt-4">
-          <Button
-            onClick={handleSubmit}
-            type="primary"
-            className="mb-3"
-            block
-            shape="round"
-            icon={<SearchOutlined />}
-            size="large"
-            disabled={loadingFilters || loadingProducts}
+        <div className="bg-primary px-4">
+          <Select
+            className="w-100 text-primary"
+            value={sort}
+            onChange={(value) => setSort(value)}
           >
-            Search
-          </Button>
-          <Button
-            onClick={handleClearFilters}
-            type="primary"
-            className="mb-3"
-            block
-            shape="round"
-            icon={<SearchOutlined />}
-            size="small"
-            disabled={loadingFilters || loadingProducts}
-          >
-            Clear Filters
-          </Button>
+            <Option value={['Best Sellers', 'sold', 'desc']}>
+              Best Sellers
+            </Option>
+            <Option value={['Price: Low to High', 'price', 'asc']}>
+              Price: Low to High
+            </Option>
+            <Option value={['Price: High to Low', 'price', 'desc']}>
+              Price: High to Low
+            </Option>
+          </Select>
         </div>
-      </Menu>
-    </div>
+      </SubMenu>
+      <SubMenu
+        key="price"
+        title={
+          <span className="h5">
+            <DollarOutlined />
+            Price
+          </span>
+        }
+        className="mt-4"
+      >
+        <div className="bg-primary px-4">
+          <span>
+            <InputNumber
+              placeholder="Min"
+              value={price[0] ? price[0] : ''}
+              onChange={(value) => setPrice([value, price[1]])}
+              min={0}
+              formatter={(value) => (value ? `$ ${value}` : '')}
+              className="mr-3 mb-2"
+            />
+          </span>
+          <span>
+            <InputNumber
+              placeholder="Max"
+              value={price[1]}
+              onChange={(value) => setPrice([price[0], value])}
+              formatter={(value) => (value ? `$ ${value}` : '')}
+              min={price[0] + 1}
+            />
+          </span>
+        </div>
+      </SubMenu>
+      <SubMenu
+        key="category"
+        title={
+          <span className="h5">
+            <DownSquareOutlined />
+            Categories
+          </span>
+        }
+        className="mt-4"
+      >
+        <div className="bg-primary px-4">
+          {loadingFilters ? (
+            <div className="mr-4">
+              <LoadingForm />
+            </div>
+          ) : (
+            allCategories &&
+            allCategories.length > 0 &&
+            allCategories.map((category) => (
+              <div key={category._id}>
+                <Checkbox
+                  name="category"
+                  className="pb-2"
+                  value={category._id}
+                  onChange={handleCategories}
+                  checked={categories.includes(category._id)}
+                >
+                  <span className="h6 text-primary">{category.name}</span>
+                </Checkbox>
+              </div>
+            ))
+          )}
+        </div>
+      </SubMenu>
+      <SubMenu
+        key="subcategory"
+        title={
+          <span className="h5">
+            <DownSquareOutlined />
+            Subcategories
+          </span>
+        }
+        className="mt-4"
+      >
+        <div className="bg-primary px-4">
+          {loadingFilters ? (
+            <div className="mr-4">
+              <LoadingForm />
+            </div>
+          ) : (
+            allSubcategories &&
+            allSubcategories.length > 0 &&
+            allSubcategories.map((subcategory) => (
+              <div
+                onClick={() => handleSubcategories(subcategory._id)}
+                key={subcategory._id}
+                className={`p-1 m-1 badge badge-pill ${
+                  subcategories.includes(subcategory._id)
+                    ? 'badge-danger'
+                    : 'badge-primary'
+                }`}
+                style={{ cursor: 'pointer' }}
+              >
+                <h6 className="text-white m-0 px-1">{subcategory.name}</h6>
+              </div>
+            ))
+          )}
+        </div>
+      </SubMenu>
+      <SubMenu
+        key="rating"
+        title={
+          <span className="h5">
+            <StarOutlined />
+            Rating
+          </span>
+        }
+        className="mt-4"
+      >
+        <div className="bg-primary px-4">
+          <RatingsForm
+            starClick={handleRating}
+            numberOfStars={5}
+            rating={rating}
+          />
+          <br />
+          <RatingsForm
+            starClick={handleRating}
+            numberOfStars={4}
+            rating={rating}
+          />
+          <br />
+          <RatingsForm
+            starClick={handleRating}
+            numberOfStars={3}
+            rating={rating}
+          />
+          <br />
+          <RatingsForm
+            starClick={handleRating}
+            numberOfStars={2}
+            rating={rating}
+          />
+          <br />
+          <RatingsForm
+            starClick={handleRating}
+            numberOfStars={1}
+            rating={rating}
+          />
+        </div>
+      </SubMenu>
+      <SubMenu
+        key="shipping"
+        title={
+          <span className="h5">
+            <SortAscendingOutlined />
+            Shipping
+          </span>
+        }
+        className="mt-4"
+      >
+        <div className="bg-primary px-4">
+          <Select
+            className="w-100 text-primary"
+            defaultValue={null}
+            value={shipping && shipping}
+            onChange={(value) => setShipping(value)}
+          >
+            <Option value={null}>Select</Option>
+            <Option value={true}>Yes</Option>
+            <Option value={false}>No</Option>
+          </Select>
+        </div>
+      </SubMenu>
+      <div className="mt-4 px-4">
+        <Button
+          onClick={handleSubmit}
+          type="primary"
+          className="mb-3"
+          block
+          shape="round"
+          icon={<SearchOutlined />}
+          size="large"
+          disabled={loadingFilters || loadingProducts}
+        >
+          Search
+        </Button>
+        <Button
+          onClick={handleClearFilters}
+          type="danger"
+          className="mb-3 float-right"
+          shape="round"
+          icon={<CloseOutlined />}
+          size="small"
+          disabled={loadingFilters || loadingProducts}
+        >
+          Clear Filters
+        </Button>
+      </div>
+    </Menu>
   );
 };
 

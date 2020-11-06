@@ -171,7 +171,7 @@ const handleQuery = async (req, res) => {
               }
             }
           },
-          { $match: { floorAverage: value } }
+          { $match: { floorAverage: { $gte: value } } }
         ])
           .exec()
           .then((aggregates) => {

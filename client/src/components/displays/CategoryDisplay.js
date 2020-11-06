@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllCategories } from '../../api/category';
 import { getAllSubcategories } from '../../api/subcategory';
@@ -10,31 +10,47 @@ const CategoryDisplay = ({ name }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   useEffect(() => {
     setLoading(true);
 
     name === 'Categories' &&
       getAllCategories()
         .then((res) => {
-          setCategories(res.data);
-          setLoading(false);
+          if (!unmounted.current) {
+            setCategories(res.data);
+            setLoading(false);
+          }
         })
         .catch((error) => {
-          toast.error(error.message);
+          if (!unmounted.current) {
+            toast.error(error.message);
 
-          setLoading(false);
+            setLoading(false);
+          }
         });
 
     name === 'Subcategories' &&
       getAllSubcategories()
         .then((res) => {
-          setCategories(res.data);
-          setLoading(false);
+          if (!unmounted.current) {
+            setCategories(res.data);
+            setLoading(false);
+          }
         })
         .catch((error) => {
-          toast.error(error.message);
+          if (!unmounted.current) {
+            toast.error(error.message);
 
-          setLoading(false);
+            setLoading(false);
+          }
         });
   }, [name]);
 

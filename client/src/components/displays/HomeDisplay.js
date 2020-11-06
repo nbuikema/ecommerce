@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getProductsWithQuery, getProductsCount } from '../../api/product';
 import { toast } from 'react-toastify';
 
@@ -15,18 +15,30 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
   const [loadingCount, setLoadingCount] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   useEffect(() => {
     setLoadingCount(true);
 
     getProductsCount()
       .then((res) => {
-        setProductsCount(res.data);
-        setLoadingCount(false);
+        if (!unmounted.current) {
+          setProductsCount(res.data);
+          setLoadingCount(false);
+        }
       })
       .catch((error) => {
-        toast.error(error.message);
+        if (!unmounted.current) {
+          toast.error(error.message);
 
-        setLoadingCount(false);
+          setLoadingCount(false);
+        }
       });
   }, []);
 
@@ -35,13 +47,17 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
 
     getProductsWithQuery(sort, order, limit, page)
       .then((res) => {
-        setProducts(res.data);
-        setLoadingProducts(false);
+        if (!unmounted.current) {
+          setProducts(res.data);
+          setLoadingProducts(false);
+        }
       })
       .catch((error) => {
-        toast.error(error.message);
+        if (!unmounted.current) {
+          toast.error(error.message);
 
-        setLoadingProducts(false);
+          setLoadingProducts(false);
+        }
       });
   }, [sort, order, limit, page]);
 
@@ -90,6 +106,7 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
               total={productsCount}
               pageSize={limit}
               showSizeChanger={false}
+              hideOnSinglePage
               onChange={(value) => setPage(value)}
               className="text-center"
               disabled={loadingProducts}
