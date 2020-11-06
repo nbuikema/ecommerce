@@ -1,17 +1,19 @@
 import React from 'react';
 import Typewriter from 'typewriter-effect';
 
-import HomeDisplay from '../../components/displays/HomeDisplay';
-import CategoryDisplay from '../../components/displays/CategoryDisplay';
+import HomeDisplay from '../../../components/displays/HomeDisplay/HomeDisplay';
+import CategoryDisplay from '../../../components/displays/CategoryDisplay/CategoryDisplay';
+
+import './Home.css';
 
 const Home = () => {
   return (
     <>
-      <div className="jumbotron text-center text-danger h1 font-weight-bold">
+      <div className="jumbotron text-center text-primary h1 font-weight-bold m-0">
         Check Out Our
         <Typewriter
           options={{
-            strings: ['New Arrivals', 'Best Sellers', 'Highest Rated'],
+            strings: ['New Arrivals', 'Best Sellers', 'Popular Products'],
             autoStart: true,
             loop: true
           }}

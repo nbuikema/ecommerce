@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getProductsWithQuery, getProductsCount } from '../../api/product';
+import { getProductsWithQuery, getProductsCount } from '../../../api/product';
 import { toast } from 'react-toastify';
 
-import ProductCard from '../../components/cards/ProductCard';
-import LoadingCard from '../../components/cards/LoadingCard';
-import LoadingForm from '../../components/forms/LoadingForm';
+import ProductCard from '../../../components/cards/ProductCard';
+import LoadingCard from '../../../components/cards/LoadingCard';
+import LoadingForm from '../../../components/forms/LoadingForm';
 
 import { Pagination } from 'antd';
 
@@ -46,8 +46,10 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
   }, [sort, order, limit, page]);
 
   return (
-    <div className="mb-5">
-      <h4 className="text-center p-3 mb-5 display-4 jumbotron">{name}</h4>
+    <div className="pb-5 bg-primary">
+      <h4 className="text-center p-3 mb-5 display-4 jumbotron text-primary">
+        {name}
+      </h4>
       <div className="container">
         <div className="row">
           {loadingCount ? (

@@ -2,6 +2,27 @@ body {
   overflow-y: scroll;
 }
 
+.text-primary {
+  color: #2c1802 !important;
+}
+
+.bg-primary {
+  background-color: #fbf4e1 !important;
+}
+
+.btn.btn-raised.btn-light,
+.btn.btn-raised.btn-light:hover {
+  color: #2c1802 !important;
+}
+
+.ant-pagination-item-active,
+.ant-pagination-item:focus > *,
+.ant-pagination-item:hover,
+.ant-pagination-item-link:hover {
+  border-color: #2c1802 !important;
+  color: #2c1802 !important;
+}
+
 .ant-card-body {
   flex-grow: 1;
 }
