@@ -19,7 +19,7 @@ $(document).ready(() => {
   });
 
   $(window).resize(() => {
-    if ($(window).width() >= 768 && $('.navbar-collapse').hasClass('show')) {
+    if ($(window).width() >= 992 && $('.navbar-collapse').hasClass('show')) {
       $('.navbar-collapse').removeClass('show');
     }
   });

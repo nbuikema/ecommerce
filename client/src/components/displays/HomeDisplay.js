@@ -71,13 +71,13 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
           {loadingCount ? (
             <>
               <div className="col-md-4 pb-3 px-2 px-lg-4">
-                <LoadingCard showCustomer={true} />
+                <LoadingCard />
               </div>
               <div className="col-md-4 pb-3 px-2 px-lg-4">
-                <LoadingCard showCustomer={true} />
+                <LoadingCard />
               </div>
               <div className="col-md-4 pb-3 px-2 px-lg-4">
-                <LoadingCard showCustomer={true} />
+                <LoadingCard />
               </div>
             </>
           ) : (

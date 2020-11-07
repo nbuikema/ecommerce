@@ -10,10 +10,24 @@ exports.createOrUpdateUser = async (req, res) => {
       name = email.split('@')[0];
     }
 
-    const user = await User.findOneAndUpdate(
+    const user = await User.findOneAndUpdate({ email }, { name }, { new: true })
+      .populate('cart.product')
+      .populate('category')
+      .populate('wishlist')
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'products.product'
+        }
+      })
+      .exec();
+
+    res.json(user);
+
+    await User.findOneAndUpdate(
       { email },
-      { name },
-      { new: true }
+      { lastLogin: Date.now() },
+      { new: true, timestamps: false }
     );
 
     if (user) {
@@ -21,7 +35,8 @@ exports.createOrUpdateUser = async (req, res) => {
     } else {
       const newUser = await new User({
         email,
-        name
+        name,
+        lastLogin: Date.now()
       }).save();
 
       return res.json(newUser);

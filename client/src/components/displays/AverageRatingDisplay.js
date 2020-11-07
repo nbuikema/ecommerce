@@ -26,7 +26,7 @@ const RatingModal = ({ product }) => {
         starDimension="20px"
         starSpacing="2px"
       />
-      <span className="pl-2">
+      <span className="pl-2 text-primary">
         {product && product.ratings && product.ratings.length > 0
           ? `(${product.ratings.length})`
           : '(0)'}

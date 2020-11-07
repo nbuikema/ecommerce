@@ -11,8 +11,8 @@ const INITIAL_STATE = {
 
 export const cartReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'TOGGLE_CART':
-      return { ...state, showDrawer: !state.showDrawer };
+    case 'SHOW_CART':
+      return { ...state, showDrawer: action.payload };
     case 'ADD_TO_CART':
       return {
         ...state,

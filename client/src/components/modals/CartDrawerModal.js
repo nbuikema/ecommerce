@@ -2,10 +2,12 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { updateCart } from '../../api/user';
+import { toast } from 'react-toastify';
 
 import ProductCard from '../cards/ProductCard';
 
-import { Drawer } from 'antd';
+import { Drawer, Button } from 'antd';
+import { ShoppingCartOutlined, CloseOutlined } from '@ant-design/icons';
 
 const CartDrawerModal = () => {
   const {
@@ -17,20 +19,26 @@ const CartDrawerModal = () => {
 
   const handleDrawerToggle = () => {
     dispatch({
-      type: 'TOGGLE_CART'
+      type: 'SHOW_CART',
+      payload: false
     });
   };
 
   const emptyCart = () => {
+    dispatch({
+      type: 'EMPTY_CART'
+    });
+
     user &&
       updateCart(cart, null, user.token)
-        .then(() => {
+        .then((res) => {
           dispatch({
-            type: 'EMPTY_CART'
+            type: 'GET_CART_FROM_DB',
+            payload: res.data
           });
         })
         .catch((error) => {
-          console.log(error);
+          toast.error(error.message);
         });
   };
 
@@ -38,18 +46,19 @@ const CartDrawerModal = () => {
     <Drawer
       visible={showDrawer}
       onClose={handleDrawerToggle}
-      title="Cart"
+      title="My Cart"
       className="text-center"
       placement="right"
       width={375}
     >
       {!cart.length ? (
-        <p>
-          No Products in Cart.{' '}
+        <h6>
+          Oops! Your cart is empty.
+          <br />
           <Link to="/shop" onClick={handleDrawerToggle}>
             Continue Shopping
           </Link>
-        </p>
+        </h6>
       ) : (
         cart.map((item) => (
           <div className="pb-3 d-flex" key={item.product._id}>
@@ -61,22 +70,31 @@ const CartDrawerModal = () => {
           </div>
         ))
       )}
-      <Link
-        to="/cart"
-        className="text-center btn btn-primary btn-raised btn-block"
-        onClick={handleDrawerToggle}
-        disabled={!cart.length}
-      >
-        Review Order
+      <Link to="/cart">
+        <Button
+          type="primary"
+          className="my-3"
+          block
+          shape="round"
+          icon={<ShoppingCartOutlined />}
+          size="large"
+          onClick={handleDrawerToggle}
+          disabled={!cart.length}
+        >
+          Review Order
+        </Button>
       </Link>
-      <button
-        to="/cart"
-        className="text-center btn btn-sm btn-danger btn-raised float-right"
+      <Button
         onClick={emptyCart}
+        type="danger"
+        className="mb-3 float-right"
+        shape="round"
+        icon={<CloseOutlined />}
+        size="small"
         disabled={!cart.length}
       >
         Empty Cart
-      </button>
+      </Button>
     </Drawer>
   );
 };

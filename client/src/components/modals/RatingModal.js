@@ -28,7 +28,7 @@ const RatingModal = ({ children, handleSubmitRating, product, rating }) => {
   return (
     <>
       <div onClick={handleModal}>
-        {user && user.token && rating === 0 ? (
+        {!user || (user && user.token && rating === 0) ? (
           <StarOutlined className="text-danger" />
         ) : (
           <StarFilled className="text-danger" />

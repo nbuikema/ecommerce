@@ -21,22 +21,22 @@ const ShopDisplay = ({
         {loadingProducts ? (
           <>
             <div className="col-md-6 col-xl-4 pb-3 px-2">
-              <LoadingCard showCustomer={true} />
+              <LoadingCard />
             </div>
             <div className="col-md-6 col-xl-4 pb-3 px-2">
-              <LoadingCard showCustomer={true} />
+              <LoadingCard />
             </div>
             <div className="col-md-6 col-xl-4 pb-3 px-2">
-              <LoadingCard showCustomer={true} />
+              <LoadingCard />
             </div>
             <div className="col-md-6 col-xl-4 pb-3 px-2">
-              <LoadingCard showCustomer={true} />
+              <LoadingCard />
             </div>
             <div className="col-md-6 col-xl-4 pb-3 px-2">
-              <LoadingCard showCustomer={true} />
+              <LoadingCard />
             </div>
             <div className="col-md-6 col-xl-4 pb-3 px-2">
-              <LoadingCard showCustomer={true} />
+              <LoadingCard />
             </div>
           </>
         ) : (

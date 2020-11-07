@@ -217,7 +217,7 @@ const Shop = () => {
             visible={showFilters}
             onClose={() => setShowFilters(false)}
             width={375}
-            className="d-block d-lg-none"
+            className="d-block d-lg-none text-center"
           >
             <ProductFilterForm
               setSort={setSort}

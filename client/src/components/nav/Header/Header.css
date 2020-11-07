@@ -31,7 +31,7 @@
   transform: scaleX(1);
 }
 
-.active:after {
+.nav-item.active:after {
   position: relative;
   display: block;
   content: '';

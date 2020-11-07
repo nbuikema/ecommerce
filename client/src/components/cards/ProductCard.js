@@ -54,7 +54,7 @@ const ProductCard = ({
     });
 
     dispatch({
-      type: 'TOGGLE_CART',
+      type: 'SHOW_CART',
       payload: true
     });
 
@@ -121,35 +121,42 @@ const ProductCard = ({
   const handleWishlist = (e) => {
     e.stopPropagation();
 
-    user && user.wishlist.find((p) => p._id === _id)
-      ? removeFromWishlist(user.token, _id)
-          .then(async (res) => {
-            const updateUser = await { ...res.data, token: user.token };
+    if (user && user.token) {
+      user.wishlist.find((p) => p._id === _id)
+        ? removeFromWishlist(user.token, _id)
+            .then(async (res) => {
+              const updateUser = await { ...res.data, token: user.token };
 
-            dispatch({
-              type: 'UPDATE_USER',
-              payload: updateUser
+              dispatch({
+                type: 'UPDATE_USER',
+                payload: updateUser
+              });
+
+              toast.success(`${title} has been removed from your wishlist!`);
+            })
+            .catch((error) => {
+              toast.error(error.message);
+            })
+        : addToWishlist(user.token, _id)
+            .then(async (res) => {
+              const updateUser = await { ...res.data, token: user.token };
+
+              dispatch({
+                type: 'UPDATE_USER',
+                payload: updateUser
+              });
+
+              toast.success(`${title} has been added to your wishlist!`);
+            })
+            .catch((error) => {
+              toast.error(error.message);
             });
-
-            toast.success(`${title} has been removed from your wishlist!`);
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-      : addToWishlist(user.token, _id)
-          .then(async (res) => {
-            const updateUser = await { ...res.data, token: user.token };
-
-            dispatch({
-              type: 'UPDATE_USER',
-              payload: updateUser
-            });
-
-            toast.success(`${title} has been added to your wishlist!`);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+    } else {
+      history.push({
+        pathname: '/login',
+        state: { from: history.location.pathname }
+      });
+    }
   };
 
   const showActions = () => {
@@ -209,20 +216,19 @@ const ProductCard = ({
             ? user.wishlist.find((p) => p._id === _id)
               ? 'Remove from Wishlist'
               : 'Add to Wishlist'
-            : 'Login to Leave Rating'}
+            : 'Login for Wishlist'}
         </div>
       ];
     }
     if (showCart) {
       return [
-        <div>
+        <div onClick={(e) => e.stopPropagation()}>
           <span onClick={(e) => e.stopPropagation()}>
             <InputNumber
               min={1}
               max={product.quantity}
               value={quantity}
               onChange={(value) => handleQuantityChange(value, product)}
-              onClick={(e) => e.preventDefault()}
             />
             <br />
             Quantity
@@ -243,7 +249,14 @@ const ProductCard = ({
   return (
     <div
       className="d-flex w-100"
-      onClick={() => history.push(`/product/${slug}`)}
+      onClick={() => {
+        history.push(`/product/${slug}`);
+
+        dispatch({
+          type: 'SHOW_CART',
+          payload: false
+        });
+      }}
     >
       <Card
         hoverable

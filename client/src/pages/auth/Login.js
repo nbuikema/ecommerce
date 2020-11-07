@@ -41,20 +41,43 @@ const Login = ({ history }) => {
       const { token } = await user.getIdTokenResult();
 
       createOrUpdateUser(token)
-        .then(({ data: { _id, email, name, role } }) => {
-          dispatch({
-            type: 'LOGGED_IN_USER',
-            payload: {
+        .then(
+          ({
+            data: {
               _id,
               email,
               name,
               role,
-              token
+              cart,
+              address,
+              orders,
+              wishlist,
+              lastLogin
             }
-          });
+          }) => {
+            dispatch({
+              type: 'LOGGED_IN_USER',
+              payload: {
+                _id,
+                email,
+                name,
+                role,
+                address,
+                orders,
+                wishlist,
+                lastLogin,
+                token
+              }
+            });
 
-          roleBasedRedirect(role);
-        })
+            dispatch({
+              type: 'GET_CART_FROM_DB',
+              payload: cart
+            });
+
+            roleBasedRedirect(role);
+          }
+        )
         .catch((error) => {
           toast.error(error);
         });
@@ -69,20 +92,43 @@ const Login = ({ history }) => {
         const { token } = await user.getIdTokenResult();
 
         createOrUpdateUser(token)
-          .then(({ data: { _id, email, name, role } }) => {
-            dispatch({
-              type: 'LOGGED_IN_USER',
-              payload: {
+          .then(
+            ({
+              data: {
                 _id,
                 email,
                 name,
                 role,
-                token
+                cart,
+                address,
+                orders,
+                wishlist,
+                lastLogin
               }
-            });
+            }) => {
+              dispatch({
+                type: 'LOGGED_IN_USER',
+                payload: {
+                  _id,
+                  email,
+                  name,
+                  role,
+                  address,
+                  orders,
+                  wishlist,
+                  lastLogin,
+                  token
+                }
+              });
 
-            roleBasedRedirect(role);
-          })
+              dispatch({
+                type: 'GET_CART_FROM_DB',
+                payload: cart
+              });
+
+              roleBasedRedirect(role);
+            }
+          )
           .catch((error) => {
             toast.error(error);
           });
