@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Form, Input, Button, Select } from 'antd';
+import { FileAddOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { Item } = Form;
 const { Group, TextArea } = Input;
@@ -132,8 +133,15 @@ const DeliveryAddressForm = ({ onFinish, address }) => {
         </Item>
       </Item>
       <Item>
-        <Button type="primary" htmlType="submit">
-          Submit
+        <Button
+          type="primary"
+          block
+          shape="round"
+          icon={<FileAddOutlined />}
+          size="large"
+          className="mt-3"
+        >
+          Add Address
         </Button>
       </Item>
     </Form>

@@ -29,8 +29,6 @@ const Checkout = () => {
     zip: '',
     additionalInfo: ''
   });
-  const [succeeded, setSucceeded] = useState(false);
-  const [processing, setProcessing] = useState('');
 
   const { user } = useSelector((state) => ({ ...state }));
 
@@ -155,15 +153,10 @@ const Checkout = () => {
               onClick={() => handleChangeTab('2')}
               disabled={!address.address}
             >
-              <h4>Payment Info</h4>
+              <h4 className="text-primary">Payment Info</h4>
+              <hr />
               <Elements stripe={promise}>
-                <StripeCheckoutForm
-                  address={address}
-                  succeeded={succeeded}
-                  setSucceeded={setSucceeded}
-                  processing={processing}
-                  setProcessing={setProcessing}
-                />
+                <StripeCheckoutForm address={address} />
               </Elements>
             </TabPane>
           </Tabs>

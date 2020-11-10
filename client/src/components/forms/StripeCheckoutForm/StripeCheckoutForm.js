@@ -10,16 +10,12 @@ import { DollarOutlined } from '@ant-design/icons';
 
 import './StripeCheckoutForm.css';
 
-const StripeCheckoutForm = ({
-  address,
-  succeeded,
-  setSucceeded,
-  processing,
-  setProcessing
-}) => {
+const StripeCheckoutForm = ({ address }) => {
   const [error, setError] = useState(null);
   const [disabled, setDisabled] = useState(true);
   const [clientSecret, setClientSecret] = useState('');
+  const [succeeded, setSucceeded] = useState(false);
+  const [processing, setProcessing] = useState('');
 
   const {
     user,
@@ -139,11 +135,15 @@ const StripeCheckoutForm = ({
 
   return (
     <>
-      <h6 className={succeeded ? 'result-message' : 'result-message hidden'}>
+      <h5 className={`text-center ${succeeded ? 'd-block' : 'd-none'}`}>
         Payment Successful.{' '}
         <Link to="/user/orders">See it in your purchase history.</Link>
-      </h6>
-      <form id="payment-form" className="stripe-form" onSubmit={handleSubmit}>
+      </h5>
+      <form
+        id="payment-form"
+        className="stripe-form px-lg-3 pt-4"
+        onSubmit={handleSubmit}
+      >
         <CardElement
           id="card-element"
           options={cartStyle}
