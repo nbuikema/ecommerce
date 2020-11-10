@@ -71,10 +71,10 @@ const Shop = () => {
       })
       .catch((error) => {
         if (!unmounted.current) {
-          toast.error(error.message);
-
           setLoadingProductsCount(false);
         }
+
+        toast.error(error.message);
       });
   }, [
     search.text,
@@ -119,10 +119,10 @@ const Shop = () => {
       })
       .catch((error) => {
         if (!unmounted.current) {
-          toast.error(error.message);
-
           setLoadingProducts(false);
         }
+
+        toast.error(error.message);
       });
     // eslint-disable-next-line
   }, [
@@ -183,10 +183,10 @@ const Shop = () => {
       })
       .catch((error) => {
         if (!unmounted.current) {
-          toast.error(error.message);
-
           setLoadingProducts(false);
         }
+
+        toast.error(error.message);
       });
   };
 

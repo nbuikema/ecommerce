@@ -106,11 +106,11 @@ const App = () => {
         <Route exact path="/product/:slug" component={Product} />
         <Route exact path="/shop" component={Shop} />
         <Route exact path="/cart" component={Cart} />
-        <Route exact path="/checkout" component={Checkout} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/register/complete" component={RegisterComplete} />
         <Route exact path="/forgot/password" component={ForgotPassword} />
+        <UserRoute exact path="/checkout" ready={ready} component={Checkout} />
         <UserRoute
           exact
           path="/user/dashboard"

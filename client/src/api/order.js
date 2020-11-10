@@ -48,10 +48,16 @@ export const updateOrder = async (authtoken, orderId, orderStatus) => {
   );
 };
 
-export const createOrder = async (authtoken, cart, address, paymentIntent) => {
+export const createOrder = async (
+  authtoken,
+  cart,
+  address,
+  paymentIntent,
+  coupon
+) => {
   return await axios.post(
     `${process.env.REACT_APP_API}/order`,
-    { address, cart, paymentIntent },
+    { address, cart, paymentIntent, coupon },
     {
       headers: {
         authtoken

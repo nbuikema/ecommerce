@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useSelector, useDispatch } from 'react-redux';
-import { createPaymentIntent } from '../../api/stripe';
-import { createOrder } from '../../api/order';
+import { createPaymentIntent } from '../../../api/stripe';
+import { createOrder } from '../../../api/order';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { DollarOutlined } from '@ant-design/icons';
 
 import './StripeCheckoutForm.css';
 
 const StripeCheckoutForm = ({
   address,
-  coupon,
-  discount,
   succeeded,
   setSucceeded,
   processing,
@@ -20,25 +21,48 @@ const StripeCheckoutForm = ({
   const [disabled, setDisabled] = useState(true);
   const [clientSecret, setClientSecret] = useState('');
 
-  const { user, cart } = useSelector((state) => ({ ...state }));
+  const {
+    user,
+    cart: { cart, coupon }
+  } = useSelector((state) => ({ ...state }));
 
   const dispatch = useDispatch();
 
   const stripe = useStripe();
   const elements = useElements();
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   useEffect(() => {
     !succeeded &&
-      createPaymentIntent(user.token, cart, address, coupon, discount)
+      createPaymentIntent(
+        user.token,
+        cart,
+        address,
+        coupon.name,
+        coupon.discount
+      )
         .then((res) => {
-          setClientSecret(res.data.clientSecret);
+          if (!unmounted.current) {
+            setClientSecret(res.data.clientSecret);
+          }
         })
         .catch((error) => {
-          console.log(error);
+          if (!unmounted.current) {
+            setError(error.message);
+          }
+
+          toast.error(error.message);
         });
 
     // eslint-disable-next-line
-  }, [discount, address, cart]);
+  }, [coupon, address, cart]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,11 +78,21 @@ const StripeCheckoutForm = ({
     });
 
     if (payload.error) {
-      setError(`Payment failed ${payload.error.message}`);
-      setProcessing(false);
+      if (!unmounted.current) {
+        setError(`Payment failed: ${payload.error.message}`);
+        setProcessing(false);
+      }
     } else {
-      createOrder(user.token, cart, address, payload)
+      createOrder(user.token, cart, address, payload, coupon._id)
         .then(async (res) => {
+          if (!unmounted.current) {
+            elements.getElement(CardElement).clear();
+
+            setError(null);
+            setProcessing(false);
+            setSucceeded(true);
+          }
+
           const updateUser = await { ...res.data, token: user.token };
 
           dispatch({
@@ -69,14 +103,14 @@ const StripeCheckoutForm = ({
           dispatch({
             type: 'EMPTY_CART'
           });
+
+          dispatch({
+            type: 'REMOVE_COUPON'
+          });
         })
         .catch((error) => {
-          console.log(error);
+          toast.error(error.message);
         });
-
-      setError(null);
-      setProcessing(false);
-      setSucceeded(true);
     }
   };
 
@@ -105,11 +139,10 @@ const StripeCheckoutForm = ({
 
   return (
     <>
-      <p className={succeeded ? 'result-message' : 'result-message hidden'}>
+      <h6 className={succeeded ? 'result-message' : 'result-message hidden'}>
         Payment Successful.{' '}
         <Link to="/user/orders">See it in your purchase history.</Link>
-      </p>
-
+      </h6>
       <form id="payment-form" className="stripe-form" onSubmit={handleSubmit}>
         <CardElement
           id="card-element"
@@ -117,12 +150,12 @@ const StripeCheckoutForm = ({
           onChange={handleChange}
         />
         <button
-          className="stripe-button"
+          type="submit"
+          className="my-3 btn btn-success btn-block btn-raised ant-btn-round"
+          style={{ fontSize: '20px', height: '40px' }}
           disabled={processing || disabled || succeeded}
         >
-          <span id="button-text">
-            {processing ? <div className="spinner" id="spinner"></div> : 'Pay'}
-          </span>
+          <DollarOutlined /> Pay
         </button>
         <br />
         {error && (

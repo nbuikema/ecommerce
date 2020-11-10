@@ -6,11 +6,7 @@ const RatingModal = ({ title, images }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const showImages = () => (
-    <div
-      id="carouselExampleIndicators"
-      className="carousel slide"
-      data-ride="carousel"
-    >
+    <div id="carousel" className="carousel slide" data-ride="carousel">
       <div className="carousel-inner">
         {images &&
           images.length > 0 &&
@@ -28,7 +24,7 @@ const RatingModal = ({ title, images }) => {
           ))}
         <a
           className="carousel-control-prev"
-          href="#carouselExampleIndicators"
+          href="#carousel"
           role="button"
           data-slide="prev"
         >
@@ -40,7 +36,7 @@ const RatingModal = ({ title, images }) => {
         </a>
         <a
           className="carousel-control-next"
-          href="#carouselExampleIndicators"
+          href="#carousel"
           role="button"
           data-slide="next"
         >
@@ -58,7 +54,7 @@ const RatingModal = ({ title, images }) => {
             <li
               className={`col px-0 mb-0 ${i === 0 ? 'active' : ''}`}
               key={i}
-              data-target="#carouselExampleIndicators"
+              data-target="#carousel"
               data-slide-to={i}
             >
               <img src={image.url} className="d-block h-100" alt={image.url} />

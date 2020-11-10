@@ -19,15 +19,17 @@ exports.createPaymentIntent = async (req, res) => {
     const totalFromServer = calcCartTotal(user.cart);
 
     if (totalFromClient === totalFromServer) {
-      const { coupon, discount } = req.body;
+      const { coupon: name, discount } = req.body;
 
-      if (coupon && coupon.length > 0 && discount && discount > 0) {
-        const coupon = await Coupon.findOne({ name: coupon });
+      if (name && name.length > 0 && discount && discount > 0) {
+        const coupon = await Coupon.findOne({ name });
 
-        if (coupon.name === coupon && coupon.discount === discount) {
-          totalToCharge = Math.round(
+        if (coupon.name === name && coupon.discount === discount) {
+          const totalSaved = Math.round(
             totalFromServer * (coupon.discount / 100) * 100
           );
+
+          totalToCharge = Math.round(totalFromServer * 100) - totalSaved;
         } else {
           throw new Error('Coupons do not match.');
         }
@@ -38,6 +40,8 @@ exports.createPaymentIntent = async (req, res) => {
       throw new Error('Prices do not match.');
     }
 
+    totalToCharge = Math.round(totalToCharge * 1.0625);
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalToCharge,
       currency: 'usd'
@@ -47,6 +51,7 @@ exports.createPaymentIntent = async (req, res) => {
       clientSecret: paymentIntent.client_secret
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };

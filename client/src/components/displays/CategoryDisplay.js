@@ -31,10 +31,10 @@ const CategoryDisplay = ({ name }) => {
         })
         .catch((error) => {
           if (!unmounted.current) {
-            toast.error(error.message);
-
             setLoading(false);
           }
+
+          toast.error(error.message);
         });
 
     name === 'Subcategories' &&
@@ -47,10 +47,10 @@ const CategoryDisplay = ({ name }) => {
         })
         .catch((error) => {
           if (!unmounted.current) {
-            toast.error(error.message);
-
             setLoading(false);
           }
+
+          toast.error(error.message);
         });
   }, [name]);
 

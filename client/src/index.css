@@ -1,10 +1,14 @@
 body {
   overflow-x: hidden;
   background-color: #fbf4e1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
 }
 
 .text-primary,
-.ant-drawer-close {
+.ant-drawer-close,
+.ant-modal-close {
   color: #2c1802 !important;
 }
 
@@ -23,9 +27,22 @@ body {
   background-color: #2c1802 !important;
 }
 
-.ant-drawer-title {
+.ant-drawer-title,
+.ant-modal-title {
   color: #2c1802 !important;
   font-size: 1.3rem !important;
+}
+
+.table thead th {
+  font-size: 1.1rem;
+}
+
+.table td {
+  font-size: 1rem;
+}
+
+.coupon {
+  min-width: 250px;
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {

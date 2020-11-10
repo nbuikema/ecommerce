@@ -6,7 +6,7 @@ const { setQueryAndSort, setOrdersByDate } = require('../helpers/order');
 // create
 exports.createOrder = async (req, res) => {
   try {
-    const { cart, address, paymentIntent } = req.body;
+    const { cart, address, paymentIntent, coupon } = req.body;
 
     const foundUser = await User.findOne({ email: req.user.email }).exec();
 
@@ -14,7 +14,8 @@ exports.createOrder = async (req, res) => {
       products: cart,
       paymentIntent: paymentIntent.paymentIntent,
       orderedBy: foundUser._id,
-      address
+      address,
+      coupon
     }).save();
 
     const updatedUser = await User.findOneAndUpdate(
@@ -59,6 +60,7 @@ exports.listOrders = async (_, res) => {
     const orders = await Order.find()
       .sort('-createdAt')
       .populate('products.product')
+      .populate('coupon')
       .exec();
 
     res.json(orders);
@@ -74,6 +76,7 @@ exports.listNewOrders = async (req, res) => {
     const orders = await Order.find({ createdAt: { $gte: lastLogin } })
       .sort('-createdAt')
       .populate('products.product')
+      .populate('coupon')
       .exec();
 
     res.json(orders);

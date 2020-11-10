@@ -52,16 +52,16 @@ const CartDrawerModal = () => {
       width={375}
     >
       {!cart.length ? (
-        <h6>
+        <h5 className="text-primary">
           Oops! Your cart is empty.
           <br />
           <Link to="/shop" onClick={handleDrawerToggle}>
             Continue Shopping
           </Link>
-        </h6>
+        </h5>
       ) : (
         cart.map((item) => (
-          <div className="pb-3 d-flex" key={item.product._id}>
+          <div className="pb-3" key={item.product._id}>
             <ProductCard
               product={item.product}
               showCart={true}

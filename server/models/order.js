@@ -14,6 +14,10 @@ const orderSchema = new mongoose.Schema(
       }
     ],
     paymentIntent: {},
+    coupon: {
+      type: ObjectId,
+      ref: 'Coupon'
+    },
     orderStatus: {
       type: String,
       default: 'Received',

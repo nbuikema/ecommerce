@@ -35,10 +35,10 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
       })
       .catch((error) => {
         if (!unmounted.current) {
-          toast.error(error.message);
-
           setLoadingCount(false);
         }
+
+        toast.error(error.message);
       });
   }, []);
 
@@ -54,10 +54,10 @@ const HomeDisplay = ({ name, sort, order, limit }) => {
       })
       .catch((error) => {
         if (!unmounted.current) {
-          toast.error(error.message);
-
           setLoadingProducts(false);
         }
+
+        toast.error(error.message);
       });
   }, [sort, order, limit, page]);
 

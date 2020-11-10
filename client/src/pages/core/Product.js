@@ -50,7 +50,9 @@ const Product = ({
               return rating.postedBy.toString() === user._id.toString();
             });
 
-            existingRating && setRating(existingRating.rating);
+            if (!unmounted.current && existingRating) {
+              setRating(existingRating.rating);
+            }
           }
 
           getRelatedProducts(product.data._id)
@@ -62,21 +64,21 @@ const Product = ({
             })
             .catch((error) => {
               if (!unmounted.current) {
-                toast.error(error.message);
-
                 setLoadingRelated(false);
               }
+
+              toast.error(error.message);
             });
         }
       })
       .catch((error) => {
         if (!unmounted.current) {
           setLoadingProduct(false);
-
-          toast.error(error.message);
-
-          history.push('/shop');
         }
+
+        toast.error(error.message);
+
+        history.push('/shop');
       });
 
     // eslint-disable-next-line
@@ -96,17 +98,16 @@ const Product = ({
         if (!unmounted.current) {
           memoizedLoadProduct();
           setRating(0);
-          if (res.data.nModified === 1) {
-            toast.success('Your Review Has Been Updated.');
-          } else {
-            toast.success('Thanks For Your Review!');
-          }
+        }
+
+        if (res.data.nModified === 1) {
+          toast.success('Your Review Has Been Updated.');
+        } else {
+          toast.success('Thanks For Your Review!');
         }
       })
       .catch((error) => {
-        if (!unmounted.current) {
-          toast.error(error.message);
-        }
+        toast.error(error.message);
       });
   };
 

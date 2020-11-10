@@ -20,6 +20,12 @@ exports.createOrUpdateUser = async (req, res) => {
           path: 'products.product'
         }
       })
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'coupon'
+        }
+      })
       .exec();
 
     res.json(user);
@@ -57,6 +63,12 @@ exports.currentUser = async (req, res) => {
         path: 'orders',
         populate: {
           path: 'products.product'
+        }
+      })
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'coupon'
         }
       })
       .exec();

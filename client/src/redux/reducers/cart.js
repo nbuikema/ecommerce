@@ -6,11 +6,18 @@ import {
 
 const INITIAL_STATE = {
   cart: [],
-  showDrawer: false
+  showDrawer: false,
+  coupon: {}
 };
 
 export const cartReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case 'persist/REHYDRATE':
+      return {
+        ...state,
+        coupon: {},
+        showDrawer: false
+      };
     case 'SHOW_CART':
       return { ...state, showDrawer: action.payload };
     case 'ADD_TO_CART':
@@ -32,6 +39,10 @@ export const cartReducer = (state = INITIAL_STATE, action) => {
       return { ...state, cart: action.payload };
     case 'EMPTY_CART':
       return { ...state, cart: [] };
+    case 'ADD_COUPON':
+      return { ...state, coupon: action.payload };
+    case 'REMOVE_COUPON':
+      return { ...state, coupon: {} };
     default:
       return state;
   }

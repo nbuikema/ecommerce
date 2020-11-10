@@ -1,4 +1,5 @@
 const Coupon = require('../models/coupon');
+const moment = require('moment');
 
 // create
 exports.create = async (req, res) => {
@@ -14,7 +15,21 @@ exports.create = async (req, res) => {
 // read
 exports.read = async (req, res) => {
   try {
-    const coupon = await Coupon.findOne({ name: req.params.couponName }).exec();
+    const coupon = await Coupon.findOne({ name: req.params.couponName })
+      .select('name discount expiration')
+      .exec();
+
+    if (!coupon) {
+      throw new Error('Coupon not found.');
+    }
+
+    const currentDate = moment(Date.now()).toDate();
+
+    const expired = currentDate > coupon.expiration;
+
+    if (expired) {
+      throw new Error('Coupon is expired.');
+    }
 
     res.json(coupon);
   } catch (error) {
