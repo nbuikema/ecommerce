@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { updateCoupon, getCoupon } from '../../../api/coupon';
 import moment from 'moment-timezone';
 
-import AdminNav from '../../../components/nav/AdminNav';
 import CouponForm from '../../../components/forms/CouponForm';
 
 moment.tz.setDefault('America/New_York');
@@ -23,20 +22,33 @@ const UpdateCoupon = ({
     user: { token }
   } = useSelector((state) => ({ ...state }));
 
+  const unmounted = useRef(false);
+
   useEffect(() => {
-    getCoupon(couponName).then((coupon) => {
-      if (coupon.data) {
-        setName(coupon.data.name);
-        setDiscount(coupon.data.discount);
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
 
-        const dateObj = new Date(coupon.data.expiration);
-        const momentObj = moment(dateObj);
+  useEffect(() => {
+    getCoupon(couponName)
+      .then((coupon) => {
+        if (coupon.data) {
+          const dateObj = new Date(coupon.data.expiration);
+          const momentObj = moment(dateObj);
 
-        setExpiration(momentObj);
-      } else {
-        history.push('/admin/coupon');
-      }
-    });
+          if (!unmounted.current) {
+            setName(coupon.data.name);
+            setDiscount(coupon.data.discount);
+            setExpiration(momentObj);
+          }
+        } else {
+          history.push('/admin/coupon');
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   }, [couponName, history]);
 
   const handleSubmit = (e) => {
@@ -44,9 +56,11 @@ const UpdateCoupon = ({
 
     updateCoupon({ name, discount, expiration }, couponName, token)
       .then((res) => {
-        setName('');
-        setDiscount('');
-        setExpiration('');
+        if (!unmounted.current) {
+          setName('');
+          setDiscount('');
+          setExpiration('');
+        }
 
         toast.success(`${res.data.name} coupon has been updated.`);
 
@@ -58,25 +72,18 @@ const UpdateCoupon = ({
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-2">
-          <AdminNav />
-        </div>
-        <div className="col">
-          <h4>Update Coupon</h4>
-          <CouponForm
-            name={name}
-            setName={setName}
-            discount={discount}
-            setDiscount={setDiscount}
-            expiration={expiration}
-            setExpiration={setExpiration}
-            handleSubmit={handleSubmit}
-            method="Update"
-          />
-        </div>
-      </div>
+    <div className="container mt-4">
+      <h3 className="text-primary">Update Coupon</h3>
+      <CouponForm
+        name={name}
+        setName={setName}
+        discount={discount}
+        setDiscount={setDiscount}
+        expiration={expiration}
+        setExpiration={setExpiration}
+        handleSubmit={handleSubmit}
+        method="Update"
+      />
     </div>
   );
 };

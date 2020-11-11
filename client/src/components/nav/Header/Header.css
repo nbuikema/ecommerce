@@ -7,11 +7,11 @@
   top: -62px;
 }
 
-.navbar-nav .nav-link,
-.navbar-nav .nav-link:hover {
-  font-size: 18px;
-  font-family: 'Delius', cursive;
-  text-transform: none;
+.nav-link,
+.nav-link:hover {
+  font-size: 18px !important;
+  font-family: 'Delius', cursive !important;
+  text-transform: none !important;
   color: #2c1802 !important;
   padding-left: 1rem !important;
   padding-right: 1rem !important;

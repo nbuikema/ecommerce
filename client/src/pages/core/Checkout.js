@@ -162,7 +162,7 @@ const Checkout = () => {
           </Tabs>
         </div>
         <div className="col-lg-4 ">
-          <OrderSummaryDisplay />
+          <OrderSummaryDisplay address={address} />
         </div>
       </div>
     </div>

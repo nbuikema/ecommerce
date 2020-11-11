@@ -99,24 +99,15 @@ const Header = () => {
               >
                 <div
                   className="nav-link dropdown-toggle"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
+                  onClick={() =>
+                    dispatch({
+                      type: 'SHOW_NAV_OPTIONS',
+                      payload: true
+                    })
+                  }
                   style={{ cursor: 'pointer' }}
                 >
                   {user.email ? `${user.email}` : 'My Account'}
-                </div>
-                <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <Link className="dropdown-item" to="/user/dashboard">
-                    User Dashboard
-                  </Link>
-                  {user && user.role === 'admin' && (
-                    <Link className="dropdown-item" to="/admin/dashboard">
-                      Admin Dashboard
-                    </Link>
-                  )}
                 </div>
               </li>
               <li className="nav-item">

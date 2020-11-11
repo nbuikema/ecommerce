@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { Button } from 'antd';
 import { ShoppingOutlined } from '@ant-design/icons';
 
-const OrderSummaryDisplay = () => {
+const OrderSummaryDisplay = ({ address }) => {
   const [newCoupon, setNewCoupon] = useState('');
 
   const {
@@ -191,6 +191,21 @@ const OrderSummaryDisplay = () => {
             </Button>
           </Link>
         )
+      ) : address.address ? (
+        <>
+          <h6>
+            Delivering to {address.address},{' '}
+            {address.secondaryType !== 'None' &&
+              address.secondaryType + ' ' + address.secondaryAddress + ', '}
+            {address.city}, {address.state}, {address.zip}
+          </h6>
+          {address.additionalInfo && (
+            <p>
+              Additional Delivery Info: <br />
+              {address.additionalInfo}
+            </p>
+          )}
+        </>
       ) : null}
     </>
   );

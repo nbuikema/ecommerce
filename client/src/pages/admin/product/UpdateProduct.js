@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { updateProduct, getProduct } from '../../../api/product';
@@ -7,7 +7,6 @@ import {
   getCategorySubcategories
 } from '../../../api/category';
 
-import AdminNav from '../../../components/nav/AdminNav';
 import ProductForm from '../../../components/forms/ProductForm';
 import FileUpload from '../../../components/forms/FileUpload';
 
@@ -34,53 +33,79 @@ const UpdateProduct = ({
     user: { token }
   } = useSelector((state) => ({ ...state }));
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   const loadCategories = () => {
-    getAllCategories().then((categories) => {
-      setCategories(categories.data);
-    });
+    getAllCategories()
+      .then((categories) => {
+        if (!unmounted.current) {
+          setCategories(categories.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   useEffect(() => {
     loadCategories();
 
-    getProduct(slug).then((product) => {
-      if (product.data) {
-        const {
-          title,
-          description,
-          price,
-          category,
-          subcategories,
-          quantity,
-          images,
-          shipping
-        } = product.data;
+    getProduct(slug)
+      .then((product) => {
+        if (product.data) {
+          const {
+            title,
+            description,
+            price,
+            category,
+            subcategories,
+            quantity,
+            images,
+            shipping
+          } = product.data;
 
-        getCategorySubcategories(category._id).then((subcategories) => {
-          setSubcats(subcategories.data);
-        });
+          getCategorySubcategories(category._id)
+            .then((subcategories) => {
+              if (!unmounted.current) {
+                setSubcats(subcategories.data);
+              }
+            })
+            .catch((error) => {
+              toast.error(error.message);
+            });
 
-        let productSubcategories = [];
-        subcategories.forEach((subcategory) => {
-          productSubcategories.push(subcategory._id);
-        });
+          let productSubcategories = [];
+          subcategories.forEach((subcategory) => {
+            productSubcategories.push(subcategory._id);
+          });
 
-        setProduct({
-          title,
-          description,
-          price,
-          category: category._id,
-          subcategories: productSubcategories,
-          quantity,
-          images,
-          shipping: shipping === true ? 1 : 0
-        });
-      } else {
-        toast.error('Could not find product.');
+          if (!unmounted.current) {
+            setProduct({
+              title,
+              description,
+              price,
+              category: category._id,
+              subcategories: productSubcategories,
+              quantity,
+              images,
+              shipping: shipping === true ? 1 : 0
+            });
+          }
+        } else {
+          toast.error('Could not find product.');
 
-        history.push('/admin/products');
-      }
-    });
+          history.push('/admin/products');
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   }, [slug, history]);
 
   const handleChange = (e) => {
@@ -101,9 +126,15 @@ const UpdateProduct = ({
             category: e.target.value
           });
         }
-        getCategorySubcategories(e.target.value).then((subcategories) => {
-          setSubcats(subcategories.data);
-        });
+        getCategorySubcategories(e.target.value)
+          .then((subcategories) => {
+            if (!unmounted.current) {
+              setSubcats(subcategories.data);
+            }
+          })
+          .catch((error) => {
+            toast.error(error.message);
+          });
       }
     } else {
       setProduct({ ...product, [e.target.name]: e.target.value });
@@ -115,16 +146,18 @@ const UpdateProduct = ({
 
     updateProduct(slug, product, token)
       .then((res) => {
-        setProduct({
-          title: '',
-          description: '',
-          price: '',
-          category: '',
-          subcategories: [],
-          quantity: '',
-          images: [],
-          shipping: 0
-        });
+        if (!unmounted.current) {
+          setProduct({
+            title: '',
+            description: '',
+            price: '',
+            category: '',
+            subcategories: [],
+            quantity: '',
+            images: [],
+            shipping: 0
+          });
+        }
 
         toast.success(`${res.data.title} product has been updated.`);
 
@@ -136,24 +169,17 @@ const UpdateProduct = ({
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-2">
-          <AdminNav />
-        </div>
-        <div className="col">
-          <h4>Update Product</h4>
-          <FileUpload product={product} setProduct={setProduct} />
-          <ProductForm
-            product={product}
-            setProduct={setProduct}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            categories={categories}
-            subcats={subcats}
-          />
-        </div>
-      </div>
+    <div className="container mt-4">
+      <h3 className="text-primary">Update Product</h3>
+      <FileUpload product={product} setProduct={setProduct} />
+      <ProductForm
+        product={product}
+        setProduct={setProduct}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        categories={categories}
+        subcats={subcats}
+      />
     </div>
   );
 };

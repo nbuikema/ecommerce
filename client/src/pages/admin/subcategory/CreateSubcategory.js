@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,6 @@ import {
 } from '../../../api/subcategory';
 import Swal from 'sweetalert2';
 
-import AdminNav from '../../../components/nav/AdminNav';
 import CategoryForm from '../../../components/forms/CategoryForm';
 import SearchForm from '../../../components/forms/SearchForm';
 
@@ -27,16 +26,36 @@ const CreateSubcategory = () => {
     user: { token }
   } = useSelector((state) => ({ ...state }));
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   const loadCategories = () => {
-    getAllCategories().then((categories) => {
-      setCategories(categories.data);
-    });
+    getAllCategories()
+      .then((categories) => {
+        if (!unmounted.current) {
+          setCategories(categories.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   const loadSubcategories = () => {
-    getAllSubcategories().then((subcategories) => {
-      setSubcategories(subcategories.data);
-    });
+    getAllSubcategories()
+      .then((subcategories) => {
+        if (!unmounted.current) {
+          setSubcategories(subcategories.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   useEffect(() => {
@@ -49,8 +68,10 @@ const CreateSubcategory = () => {
 
     createSubcategory({ name, parentCategory: category }, token)
       .then((res) => {
-        setName('');
-        setCategory('-1');
+        if (!unmounted.current) {
+          setName('');
+          setCategory('-1');
+        }
 
         loadSubcategories();
 
@@ -89,63 +110,49 @@ const CreateSubcategory = () => {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-2">
-          <AdminNav />
-        </div>
-        <div className="col">
-          <h4>Create Subcategory</h4>
-          <div className="form-group">
-            <label>Parent Category</label>
-            <select
-              onChange={(e) => setCategory(e.target.value)}
-              value={category}
-              name="category"
-              className="form-control"
-            >
-              <option value="-1">Select Category</option>
-              {categories.length > 0 &&
-                categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <CategoryForm
-            name={name}
-            setName={setName}
-            handleSubmit={handleSubmit}
-            method="Create"
-          />
-          <hr />
-          <SearchForm
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-          {subcategories
-            .filter(foundCategories(searchQuery))
-            .map((subcategory) => (
-              <div className="alert alert-secondary" key={subcategory._id}>
-                {subcategory.name}
-                <span
-                  onClick={() =>
-                    handleDelete(subcategory.name, subcategory.slug)
-                  }
-                  className="btn btn-sm float-right text-danger"
-                >
-                  <DeleteOutlined />
-                </span>
-                <Link to={`/admin/subcategory/${subcategory.slug}`}>
-                  <span className="btn btn-sm float-right text-warning">
-                    <EditOutlined />
-                  </span>
-                </Link>
-              </div>
+    <div className="container mt-4">
+      <h3 className="text-primary">Create Subcategory</h3>
+      <div className="form-group">
+        <label>Parent Category</label>
+        <select
+          onChange={(e) => setCategory(e.target.value)}
+          value={category}
+          name="category"
+          className="form-control"
+        >
+          <option value="-1">Select Category</option>
+          {categories.length > 0 &&
+            categories.map((category) => (
+              <option key={category._id} value={category._id}>
+                {category.name}
+              </option>
             ))}
-        </div>
+        </select>
       </div>
+      <CategoryForm
+        name={name}
+        setName={setName}
+        handleSubmit={handleSubmit}
+        method="Create"
+      />
+      <hr />
+      <SearchForm searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      {subcategories.filter(foundCategories(searchQuery)).map((subcategory) => (
+        <div className="alert alert-secondary" key={subcategory._id}>
+          {subcategory.name}
+          <span
+            onClick={() => handleDelete(subcategory.name, subcategory.slug)}
+            className="btn btn-sm float-right text-danger"
+          >
+            <DeleteOutlined />
+          </span>
+          <Link to={`/admin/subcategory/${subcategory.slug}`}>
+            <span className="btn btn-sm float-right text-warning">
+              <EditOutlined />
+            </span>
+          </Link>
+        </div>
+      ))}
     </div>
   );
 };

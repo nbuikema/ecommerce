@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
@@ -9,7 +9,6 @@ import {
 } from '../../../api/category';
 import Swal from 'sweetalert2';
 
-import AdminNav from '../../../components/nav/AdminNav';
 import CategoryForm from '../../../components/forms/CategoryForm';
 import SearchForm from '../../../components/forms/SearchForm';
 
@@ -24,10 +23,24 @@ const CreateCategory = () => {
     user: { token }
   } = useSelector((state) => ({ ...state }));
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   const loadCategories = () => {
-    getAllCategories().then((categories) => {
-      setCategories(categories.data);
-    });
+    getAllCategories()
+      .then((categories) => {
+        if (!unmounted.current) {
+          setCategories(categories.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.response.data);
+      });
   };
 
   useEffect(() => {
@@ -39,7 +52,9 @@ const CreateCategory = () => {
 
     createCategory({ name }, token)
       .then((res) => {
-        setName('');
+        if (!unmounted.current) {
+          setName('');
+        }
 
         loadCategories();
 
@@ -78,42 +93,32 @@ const CreateCategory = () => {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-2">
-          <AdminNav />
+    <div className="container mt-4">
+      <h3 className="text-primary">Create Category</h3>
+      <CategoryForm
+        name={name}
+        setName={setName}
+        handleSubmit={handleSubmit}
+        method="Create"
+      />
+      <hr />
+      <SearchForm searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      {categories.filter(foundCategories(searchQuery)).map((category) => (
+        <div className="alert alert-secondary" key={category._id}>
+          {category.name}
+          <span
+            onClick={() => handleDelete(category.name, category.slug)}
+            className="btn btn-sm float-right text-danger"
+          >
+            <DeleteOutlined />
+          </span>
+          <Link to={`/admin/category/${category.slug}`}>
+            <span className="btn btn-sm float-right text-warning">
+              <EditOutlined />
+            </span>
+          </Link>
         </div>
-        <div className="col">
-          <h4>Create Category</h4>
-          <CategoryForm
-            name={name}
-            setName={setName}
-            handleSubmit={handleSubmit}
-            method="Create"
-          />
-          <hr />
-          <SearchForm
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-          {categories.filter(foundCategories(searchQuery)).map((category) => (
-            <div className="alert alert-secondary" key={category._id}>
-              {category.name}
-              <span
-                onClick={() => handleDelete(category.name, category.slug)}
-                className="btn btn-sm float-right text-danger"
-              >
-                <DeleteOutlined />
-              </span>
-              <Link to={`/admin/category/${category.slug}`}>
-                <span className="btn btn-sm float-right text-warning">
-                  <EditOutlined />
-                </span>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
+      ))}
     </div>
   );
 };

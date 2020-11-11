@@ -10,6 +10,8 @@ import UserRoute from './components/auth/UserRoute';
 import AdminRoute from './components/auth/AdminRoute';
 import NoPage from './components/auth/NoPage';
 import Header from './components/nav/Header/Header';
+import CartDrawerModal from './components/modals/CartDrawerModal';
+import AccountDrawer from './components/modals/AccountDrawer';
 
 import Home from './pages/core/Home';
 import Product from './pages/core/Product';
@@ -17,7 +19,6 @@ import Category from './pages/core/Category';
 import Shop from './pages/core/Shop';
 import Cart from './pages/core/Cart';
 import Checkout from './pages/core/Checkout';
-import CartDrawerModal from './components/modals/CartDrawerModal';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import RegisterComplete from './pages/auth/RegisterComplete';
@@ -25,7 +26,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import UserDashboard from './pages/user/UserDashboard';
 import Orders from './pages/user/Orders';
 import Wishlist from './pages/user/Wishlist';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminDashboard from './pages/admin/dashboard/AdminDashboard';
 import CreateCategory from './pages/admin/category/CreateCategory';
 import UpdateCategory from './pages/admin/category/UpdateCategory';
 import CreateSubcategory from './pages/admin/subcategory/CreateSubcategory';
@@ -100,6 +101,7 @@ const App = () => {
     <>
       <Header />
       <CartDrawerModal />
+      <AccountDrawer ready={ready} />
       <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />

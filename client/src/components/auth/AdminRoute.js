@@ -12,7 +12,7 @@ const AdminRoute = ({ ready, ...rest }) => {
 
   useEffect(() => {
     if (ready) {
-      if (user && user.token) {
+      if (user && user.token && user.role === 'admin') {
         currentAdmin(user.token)
           .then(() => {
             setAdmin(true);

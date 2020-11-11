@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { auth } from '../../firebase';
 import { toast } from 'react-toastify';
 
-import UserNav from '../../components/nav/UserNav';
-
 import { Button } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
 
@@ -49,16 +47,9 @@ const UserDashboard = () => {
   );
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-2">
-          <UserNav />
-        </div>
-        <div className="col">
-          <h4>My Info</h4>
-          {infoForm()}
-        </div>
-      </div>
+    <div className="container mt-4">
+      <h3 className="text-primary">My Info</h3>
+      {infoForm()}
     </div>
   );
 };

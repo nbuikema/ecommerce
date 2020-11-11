@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import {
@@ -7,7 +7,6 @@ import {
 } from '../../../api/category';
 import { createProduct } from '../../../api/product';
 
-import AdminNav from '../../../components/nav/AdminNav';
 import ProductForm from '../../../components/forms/ProductForm';
 import FileUpload from '../../../components/forms/FileUpload';
 
@@ -29,10 +28,24 @@ const CreateProduct = () => {
     user: { token }
   } = useSelector((state) => ({ ...state }));
 
+  const unmounted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
+
   const loadCategories = () => {
-    getAllCategories().then((categories) => {
-      setCategories(categories.data);
-    });
+    getAllCategories()
+      .then((categories) => {
+        if (!unmounted.current) {
+          setCategories(categories.data);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   useEffect(() => {
@@ -57,9 +70,16 @@ const CreateProduct = () => {
             category: e.target.value
           });
         }
-        getCategorySubcategories(e.target.value).then((subcategories) => {
-          setSubcats(subcategories.data);
-        });
+
+        getCategorySubcategories(e.target.value)
+          .then((subcategories) => {
+            if (!unmounted.current) {
+              setSubcats(subcategories.data);
+            }
+          })
+          .catch((error) => {
+            toast.error(error.message);
+          });
       }
     } else {
       setProduct({ ...product, [e.target.name]: e.target.value });
@@ -71,16 +91,18 @@ const CreateProduct = () => {
 
     createProduct(product, token)
       .then((res) => {
-        setProduct({
-          title: '',
-          description: '',
-          price: '',
-          category: '',
-          subcategories: [],
-          quantity: '',
-          images: [],
-          shipping: 0
-        });
+        if (!unmounted.current) {
+          setProduct({
+            title: '',
+            description: '',
+            price: '',
+            category: '',
+            subcategories: [],
+            quantity: '',
+            images: [],
+            shipping: 0
+          });
+        }
 
         toast.success(`${res.data.title} product has been created.`);
       })
@@ -90,24 +112,17 @@ const CreateProduct = () => {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-2">
-          <AdminNav />
-        </div>
-        <div className="col">
-          <h4>Create Product</h4>
-          <FileUpload product={product} setProduct={setProduct} />
-          <ProductForm
-            product={product}
-            setProduct={setProduct}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            categories={categories}
-            subcats={subcats}
-          />
-        </div>
-      </div>
+    <div className="container mt-4">
+      <h3 className="text-primary">Create Product</h3>
+      <FileUpload product={product} setProduct={setProduct} />
+      <ProductForm
+        product={product}
+        setProduct={setProduct}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        categories={categories}
+        subcats={subcats}
+      />
     </div>
   );
 };

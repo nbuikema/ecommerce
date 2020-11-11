@@ -30,6 +30,6 @@ fs.readdirSync('./routes').map((route) => {
 });
 
 // start server
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, process.env.IP, () => {
   console.log(`server started on port ${process.env.PORT}`);
 });
